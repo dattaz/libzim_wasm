@@ -17,7 +17,7 @@ libzim : lzma
 
 
 demo.html : lzma libzim demo.cpp
-	em++ demo.cpp -llzma -lzim -o demo.html -Ilzma/include -Llzma/lib -Ilibzim/include -Llibzim/lib --preload-file ekopedia_fr_all_2017-04.zim -s TOTAL_MEMORY=1677721600 -s WASM=1
+	em++ demo.cpp -llzma -lzim -o demo.html -Ilzma/include -Llzma/lib -Ilibzim/include -Llibzim/lib --preload-file meta.esperanto.stackexchange.com_eng_all_2017-05.zim -s WASM=1
 clean :
 	rm -rf demo.js demo.html demo.data demo.wasm
 	rm -rf openzim

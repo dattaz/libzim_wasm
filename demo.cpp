@@ -5,7 +5,7 @@ int main(int argc, char* argv[])
 {
   try
   {
-    std::string filename = "ekopedia_fr_all_2017-04.zim";
+    std::string filename = "meta.esperanto.stackexchange.com_eng_all_2017-05.zim";
     zim::File f(filename); 
     std::cout << "will print first 100 url/title of " << filename << std::endl;
     int i=0;
