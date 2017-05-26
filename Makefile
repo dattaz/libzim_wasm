@@ -1,4 +1,4 @@
-all: demo.html
+all: demo.html demo_file_api.js
 lzma : 
 	wget https://tukaani.org/xz/xz-5.2.3.tar.gz
 	tar zxvf xz-5.2.3.tar.gz
@@ -16,10 +16,14 @@ libzim : lzma
 
 
 
-demo.html : lzma libzim demo.cpp
+demo.html : lzma libzim demo.cpp meta.esperanto.stackexchange.com_eng_all_2017-05.zim 
 	em++ demo.cpp -llzma -lzim -o demo.html -Ilzma/include -Llzma/lib -Ilibzim/include -Llibzim/lib --preload-file meta.esperanto.stackexchange.com_eng_all_2017-05.zim -s WASM=1
+
+demo_file_api.js:lzma libzim demo_file_api.cpp prejs_file_api.js postjs_file_api.js
+	em++ demo_file_api.cpp -llzma -lzim -o demo_file_api.js -Ilzma/include -Llzma/lib -Ilibzim/include -Llibzim/lib --pre-js prejs_file_api.js --post-js postjs_file_api.js -s WASM=1
+
 clean :
-	rm -rf demo.js demo.html demo.data demo.wasm
+	rm -rf demo.js demo.html demo.data demo.wasm demo_file_api.js demo_file_api.wasm 
 	rm -rf openzim
 	rm -rf xz-5.2.3 xz-5.2.3.tar.gz
 clean_lib:
