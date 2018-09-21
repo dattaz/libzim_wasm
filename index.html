@@ -1,22 +1,21 @@
 <!doctype html>
       <html>
       <head><meta charset="utf-8"><title>Web Worker + file api zim reader</title></head>
-      <html>
       <body>
-        Web Worker + file api (only work if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br>
-        See result in JS console
-        <br>
-        <script>
-          var worker = new Worker("a.out.js");
-      </script>
-<input type="file" id="your-files">
+        Web Worker + file api (only work if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br/>
+        See result in JS console<br/>
+        For now, the page needs to be reloaded to switch to another ZIM file, and it does not support split ZIM files.
+        <br/>
+      <input type="file" id="your-files">
       <script>
+        var worker = new Worker("a.out.js");
         var control = document.getElementById("your-files");
         control.addEventListener("change", function(event) {
-        // When the control has changed, there are new files
-        files = control.files;
-        worker.postMessage(files);
-        },false);
+            // When the control has changed, there are new files
+            files = control.files;
+            console.log("new files selected");
+            worker.postMessage(files);
+            },false);
       </script>
       </body>
       </html>
