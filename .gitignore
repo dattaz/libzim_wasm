@@ -1,1 +1,13 @@
 /nbproject/private/
+/icu/
+/icubuild/
+/lzma/
+/zlib-*/
+/z/
+/xz-*/
+/xz-*.tar.gz*
+/icu4c-*.tgz*
+/zlib-*.tar.gz*
+/xapian-core-*.tar.xz*
+/xapian*/
+/libzim*/

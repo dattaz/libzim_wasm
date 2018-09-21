@@ -1,0 +1,21 @@
+--- a/source/i18n/double-conversion-utils.h
++++ b/source/i18n/double-conversion-utils.h
+@@ -98,7 +98,7 @@
+ #undef DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS
+ #endif  // _WIN32
+ #else
+-#error Target architecture was not detected as supported by Double-Conversion.
++#define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #endif
+ 
+ #if defined(__GNUC__)
+--- a/source/Makefile.in
++++ b/source/Makefile.in
+@@ -60,7 +60,7 @@
+ LOCAL_BUILT_FILES = icudefs.mk config/icucross.mk config/icucross.inc
+ 
+ DOCDIRS = common i18n
+-SUBDIRS =  stubdata common i18n $(LAYOUTEX) $(ICUIO) $(TOOLS) $(DATASUBDIR) $(EXTRA) $(SAMPLE) $(TEST)
++SUBDIRS =  stubdata common i18n $(LAYOUTEX) $(ICUIO) $(TOOLS)
+ 
+ SECTION = 1
