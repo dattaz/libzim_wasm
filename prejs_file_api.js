@@ -2,6 +2,7 @@ if (typeof (Module) === "undefined") Module = {};
 self.addEventListener('message', function(e) {
     var files = e.data.files;
     var action = e.data.action;
+    var outgoingMessagePort = e.ports[0];
     if (action === "init") {        
         console.log(files[0].name);
         Module["arguments"] = ["/work/" + files[0].name];
@@ -14,6 +15,7 @@ self.addEventListener('message', function(e) {
         };
     }
     else {
-        console.log(Module.getArticleContentByUrl("/work/" + files[0].name, "A/Baby_Grand.html"));
+        var content = Module.getArticleContentByUrl("/work/" + files[0].name, "A/Baby_Grand.html");
+        outgoingMessagePort.postMessage(content);
     }
 

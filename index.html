@@ -17,7 +17,11 @@
             worker.postMessage({action: "init", files: files});
             },false);
         function callC() {
-            worker.postMessage({action: "callC", files: files});
+            var tmpMessageChannel = new MessageChannel();
+            tmpMessageChannel.port1.onmessage = function(event2){
+                console.log("response given by the webworker", event2.data);
+            };
+            worker.postMessage({action: "callC", files: files}, [tmpMessageChannel.port2]);
         }
       </script>
       <button type="button" onclick="callC()">Test javascript to C++ call</button>

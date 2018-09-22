@@ -8,6 +8,8 @@ using namespace emscripten;
 
 int main(int argc, char* argv[])
 {
+    std::cout << "libzim initialized" << std::endl;
+    return 0;
 //  try
 //  {
 //    //std::string filename = "tmp.zim"; //"meta.esperanto.stackexchange.com_eng_all_2017-05.zim";
