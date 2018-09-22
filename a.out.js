@@ -32,7 +32,8 @@ self.addEventListener('message', function(e) {
         };
     }
     else {
-        var content = Module.getArticleContentByUrl("/work/" + files[0].name, "A/Baby_Grand.html");
+        var url = e.data.url;
+        var content = Module.getArticleContentByUrl("/work/" + files[0].name, url);
         outgoingMessagePort.postMessage(content);
     }
 

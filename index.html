@@ -21,7 +21,7 @@
             tmpMessageChannel.port1.onmessage = function(event2){
                 console.log("response given by the webworker", event2.data);
             };
-            worker.postMessage({action: "callC", files: files}, [tmpMessageChannel.port2]);
+            worker.postMessage({action: "callC", files: files, url: "A/Baby_Grand.html"}, [tmpMessageChannel.port2]);
         }
       </script>
       <button type="button" onclick="callC()">Test javascript to C++ call</button>
