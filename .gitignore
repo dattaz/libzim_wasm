@@ -9,5 +9,6 @@
 /icu4c-*.tgz*
 /zlib-*.tar.gz*
 /xapian-core-*.tar.xz*
+/libzim-*.tar.gz
 /xapian*/
 /libzim*/
