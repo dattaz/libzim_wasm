@@ -3,9 +3,9 @@
       <head><meta charset="utf-8"><title>Web Worker + file api zim reader</title></head>
       <body>
         Web Worker + file api (only work if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br/>
-        See result in JS console<br/>
+        See result in JS console and/or in the iframe below<br/>
         For now, the page needs to be reloaded to switch to another ZIM file, and it does not support split ZIM files.<br/>
-        Reading the content is currently hard-coded with the Ray Charles ZIM file.
+        Reading the content is currently hard-coded on "Baby Grand" article, that can be found in wikipedia_en_ray_charles_2015-06.zim or wikipedia_en_ray_charles_2018-10.zim files (that can be downloaded from <a href="https://download.kiwix.org/zim/wikipedia/">https://download.kiwix.org/zim/wikipedia/</a>)
         <br/>
       <input type="file" id="your-files">
       <script>
@@ -17,15 +17,32 @@
             console.log("new files selected");
             worker.postMessage({action: "init", files: files});
             },false);
+            
+        var content;
         function callC() {
             var tmpMessageChannel = new MessageChannel();
+            var t0 = performance.now();
             tmpMessageChannel.port1.onmessage = function(event2){
-                console.log("response given by the webworker", event2.data);
+                var t1 = performance.now();
+                var readTime = Math.round(t1 - t0);
+                document.getElementById("status").textContent = "Content read in " + readTime + " milliseconds";
+                console.log("response given by the webworker in " + readTime + " milliseconds", event2.data);
+                content = event2.data;
             };
+            document.getElementById("status").textContent = "Reading content...";
             worker.postMessage({action: "callC", files: files, url: "A/Baby_Grand.html"}, [tmpMessageChannel.port2]);
+        }
+        function displayInIFrame() {
+            window.frames[0].document.body.innerHTML = content;
         }
       </script>
       <button type="button" onclick="callC()">Test javascript to C++ call</button>
+      <button type="button" onclick="displayInIFrame()">Display content in iframe</button>
+      <br/>
+      <div id="status"></div>
+      <br/>
+      <iframe id="iframeResult" style="width:100%; height:400px">
+      </iframe>
       </body>
       </html>
 
