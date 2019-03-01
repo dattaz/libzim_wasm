@@ -2,12 +2,17 @@
       <html>
       <head><meta charset="utf-8"><title>Web Worker + file api zim reader</title></head>
       <body>
-        Web Worker + file api (only work if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br/>
+          <h1>Prototype to test libzim compiled with emscripten</h1>
+        Web Worker + file api (only works if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br/>
         See result in JS console and/or in the iframe below<br/>
         For now, the page needs to be reloaded to switch to another ZIM file, and it does not support split ZIM files.<br/>
-        Reading the content is currently hard-coded on "Baby Grand" article, that can be found in wikipedia_en_ray_charles_2015-06.zim or wikipedia_en_ray_charles_2018-10.zim files (that can be downloaded from <a href="https://download.kiwix.org/zim/wikipedia/">https://download.kiwix.org/zim/wikipedia/</a>)
+        If you want to do a quick test, you can choose the file wikipedia_en_ray_charles_2015-06.zim or wikipedia_en_ray_charles_2018-10.zim files (that can be downloaded from <a href="https://download.kiwix.org/zim/wikipedia/">https://download.kiwix.org/zim/wikipedia/</a>), and use "A/Baby_Grand.html" as the URL.
         <br/>
-      <input type="file" id="your-files">
+        <br/>
+      ZIM file : <input type="file" id="your-files">
+      <br/>
+      URL : <input type="text" id="url" value="A/Baby_Grand.html">
+      <br/>
       <script>
         var worker = new Worker("a.out.js");
         var control = document.getElementById("your-files");
@@ -30,7 +35,7 @@
                 content = event2.data;
             };
             document.getElementById("status").textContent = "Reading content...";
-            worker.postMessage({action: "callC", files: files, url: "A/Baby_Grand.html"}, [tmpMessageChannel.port2]);
+            worker.postMessage({action: "callC", files: files, url: document.getElementById("url").value}, [tmpMessageChannel.port2]);
         }
         function displayInIFrame() {
             window.frames[0].document.body.innerHTML = content;
