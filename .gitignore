@@ -12,3 +12,9 @@
 /libzim-*.tar.gz
 /xapian*/
 /libzim*/
+/pugixml*/
+/pugixml-*.tar.gz
+/aria2*/
+/aria2-*.tar.gz
+/kiwix-lib*/
+/kiwix-lib-*.tar.gz
