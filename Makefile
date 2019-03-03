@@ -84,6 +84,8 @@ kiwixlibbuild : libzimbuild pugixmlbuild
 	# Depending on the environment, the parameters can be surrounded by quotes or not
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/ '-I\/usr\/include\/x86_64-linux-gnu'//g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/ -I\/usr\/include\/x86_64-linux-gnu //g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\(build all: phony src\/libkiwix.so.4.0.1\).*/\1/g' kiwix-lib-4.0.1/build/build.ninja
 	cd kiwix-lib-4.0.1; ninja -C build
