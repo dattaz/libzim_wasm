@@ -66,7 +66,25 @@ aria2build :
 	tar xf aria2-release-1.34.0.tar.gz
 	cd aria2-release-1.34.0; #TODO
 
-kiwixlibbuild : libzimbuild pugixmlbuild
+curlbuild :
+	wget -O curl-7_64_0.tar.gz https://github.com/curl/curl/archive/curl-7_64_0.tar.gz
+	tar xf curl-7_64_0.tar.gz
+	cd curl-curl-7_64_0; ./buildconf
+	cd curl-curl-7_64_0; emconfigure ./configure --prefix=`pwd`/../curlbuild
+	cd curl-curl-7_64_0; emmake make
+	cd curl-curl-7_64_0; emmake make install
+
+mustachebuild :
+	wget -O mustache-3.2.1.tar.gz https://github.com/kainjow/Mustache/archive/v3.2.1.tar.gz
+	tar xf mustache-3.2.1.tar.gz
+	sed -i -e 's/g++ /em++ /g' Mustache-3.2.1/Makefile
+	sed -i -e 's/.\/mustache//g' Mustache-3.2.1/Makefile
+	cd Mustache-3.2.1; make
+	mkdir -p mustachbuild/lib mustachebuild/include
+	cp Mustache-3.2.1/mustache.hpp mustachebuild/include
+	cp Mustache-3.2.1/mustache mustachebuild/lib
+
+kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	wget -O kiwix-lib-4.0.1.tar.gz https://github.com/kiwix/kiwix-lib/archive/4.0.1.tar.gz
 	tar xf kiwix-lib-4.0.1.tar.gz
 	# Quick and dirty way to avoid that meson checks some dependencies
@@ -82,8 +100,8 @@ kiwixlibbuild : libzimbuild pugixmlbuild
 	sed -i -e 's/ c++ / em++ /g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/ cc / emcc /g' kiwix-lib-4.0.1/build/build.ninja
 	# Depending on the environment, the parameters can be surrounded by quotes or not
-	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
-	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/mustachebuild\/include' '-I..\/..\/curlbuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include -I..\/..\/mustachebuild\/include -I..\/..\/curlbuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ '-I\/usr\/include\/x86_64-linux-gnu'//g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ -I\/usr\/include\/x86_64-linux-gnu //g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' kiwix-lib-4.0.1/build/build.ninja
@@ -95,12 +113,14 @@ demo_file_api.js: kiwixlibbuild demo_file_api.cpp prejs_file_api.js postjs_file_
 	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so -Ilibzimbuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080
 
 clean_dependencies :
-	rm -rf lzma z icubuild xapian pugixmlbuild aria2build
+	rm -rf lzma z icubuild xapian pugixmlbuild aria2build mustachebuild curlbuild
 	rm -rf xz-5.2.4 xz-5.2.4.tar.gz
 	rm -rf zlib-1.2.11 zlib-1.2.11.tar.gz
 	rm -rf icu icu4c-63_1-src.tgz
 	rm -rf pugixml-1.9 pugixml-1.9.tar.gz
 	rm -rf aria2-release-1.34.0 aria2-release-1.34.0.tar.gz
+	rm -rf curl-curl-7_64_0 curl-7_64_0.tar.gz
+	rm -rf Mustache-3.2.1 mustache-3.2.1.tar.gz
 clean_libzim :
 	rm -rf libzim-4.0.5 libzimbuild
 clean_kiwixlib :

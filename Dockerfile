@@ -1,7 +1,7 @@
 FROM apiaryio/emcc
 
 # Install build tools
-RUN apt update && apt install -y wget ninja-build meson pkg-config python3 autopoint libtool autoconf patch g++ locales curl
+RUN apt update && apt install -y wget ninja-build meson pkg-config python3 autopoint libtool autoconf patch g++ locales curl git
 # The following packages are needed for meson build, even if they are unused for compilation
 RUN apt install -y zlib1g-dev libicu-dev libxapian-dev liblzma-dev libcurl4-openssl-dev
 
