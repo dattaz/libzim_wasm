@@ -78,6 +78,7 @@ kiwixlibbuild : libzimbuild pugixmlbuild
 	sed -i -e 's#\(build all: phony \).*\(src/libzim.so...... \).*#\1\2#' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e 's/^\(build all: phony src\/libkiwix.so.4.0.1\).*/\1/g' kiwix-lib-4.0.1/build/build.ninja
 	cd kiwix-lib-4.0.1; ninja -C build
 	mkdir -p kiwixlibbuild/lib kiwixlibbuild/include
 
