@@ -40,7 +40,9 @@ libzimbuild : lzma z icubuild xapian
 	sed -i -e 's/ c++ / em++ /g' libzim-4.0.5/build/build.ninja
 	sed -i -e 's/ cc / emcc /g' libzim-4.0.5/build/build.ninja
 	sed -i -e 's#\(build all: phony \).*\(src/libzim.so...... \).*#\1\2#' libzim-4.0.5/build/build.ninja
+	# Depending on the environment, the parameters can be surrounded by quotes or not
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/lzma\/include' '-I..\/..\/z\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/xapian\/include'/g" libzim-4.0.5/build/build.ninja
+	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/lzma\/include -I..\/..\/z\/include -I..\/..\/icubuild\/include -I..\/..\/xapian\/include /g" libzim-4.0.5/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/lzma\/lib -L..\/..\/z\/lib -L..\/..\/icubuild\/lib -L..\/..\/xapian\/lib/g' libzim-4.0.5/build/build.ninja
 	# Quick and dirty way to disable MMAP
 	cd libzim-4.0.5 ; patch -p1 <../patch_libzim_for_emscripten.patch
@@ -67,16 +69,21 @@ aria2build :
 kiwixlibbuild : libzimbuild pugixmlbuild
 	wget -O kiwix-lib-4.0.1.tar.gz https://github.com/kiwix/kiwix-lib/archive/4.0.1.tar.gz
 	tar xf kiwix-lib-4.0.1.tar.gz
+	# Quick and dirty way to avoid that meson checks some dependencies
 	sed -i -e 's/^libzim_dep = .*//g' kiwix-lib-4.0.1/meson.build
 	sed -i -e 's/, libzim_dep//g' kiwix-lib-4.0.1/meson.build
 	sed -i -e 's/^pugixml_dep = .*//g' kiwix-lib-4.0.1/meson.build
 	sed -i -e 's/, pugixml_dep//g' kiwix-lib-4.0.1/meson.build
 	sed -i -e "s/error('Cannot found header mustache.hpp')//g" kiwix-lib-4.0.1/meson.build
 	cd kiwix-lib-4.0.1; meson . build
+	# Quick and dirty way to tell ninja to compile with emscripten,
+	# with the dependencies compiled above,
+	# and to remove unnecessary compilation steps
 	sed -i -e 's/ c++ / em++ /g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/ cc / emcc /g' kiwix-lib-4.0.1/build/build.ninja
-	sed -i -e 's#\(build all: phony \).*\(src/libzim.so...... \).*#\1\2#' kiwix-lib-4.0.1/build/build.ninja
+	# Depending on the environment, the parameters can be surrounded by quotes or not
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\(build all: phony src\/libkiwix.so.4.0.1\).*/\1/g' kiwix-lib-4.0.1/build/build.ninja
 	cd kiwix-lib-4.0.1; ninja -C build
