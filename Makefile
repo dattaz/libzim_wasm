@@ -61,11 +61,6 @@ pugixmlbuild :
 	cp pugixml-1.9/src/pugixml.hpp pugixmlbuild/include
 	cp pugixml-1.9/src/pugiconfig.hpp pugixmlbuild/include
 
-aria2build :
-	wget https://github.com/aria2/aria2/archive/release-1.34.0.tar.gz
-	tar xf aria2-release-1.34.0.tar.gz
-	cd aria2-release-1.34.0; #TODO
-
 curlbuild :
 	wget -O curl-7_64_0.tar.gz https://github.com/curl/curl/archive/curl-7_64_0.tar.gz
 	tar xf curl-7_64_0.tar.gz
@@ -87,6 +82,7 @@ mustachebuild :
 kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	wget -O kiwix-lib-4.0.1.tar.gz https://github.com/kiwix/kiwix-lib/archive/4.0.1.tar.gz
 	tar xf kiwix-lib-4.0.1.tar.gz
+	cd kiwix-lib-4.0.1 ; patch -p1 <../patch_kiwixlib_for_emscripten.patch
 	# Quick and dirty way to avoid that meson checks some dependencies
 	sed -i -e 's/^libzim_dep = .*//g' kiwix-lib-4.0.1/meson.build
 	sed -i -e 's/, libzim_dep//g' kiwix-lib-4.0.1/meson.build
@@ -99,15 +95,20 @@ kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	# and to remove unnecessary compilation steps
 	sed -i -e 's/ c++ / em++ /g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/ cc / emcc /g' kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e 's#\(build all: phony \).*\(src/libkiwix.so......\).*#\1\2#' kiwix-lib-4.0.1/build/build.ninja
 	# Depending on the environment, the parameters can be surrounded by quotes or not
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/mustachebuild\/include' '-I..\/..\/curlbuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include -I..\/..\/mustachebuild\/include -I..\/..\/curlbuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ '-I\/usr\/include\/x86_64-linux-gnu'//g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ -I\/usr\/include\/x86_64-linux-gnu //g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e 's/'-Wnon-virtual-dtor'//g' kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e 's/-Wnon-virtual-dtor//g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/^\(build all: phony src\/libkiwix.so.4.0.1\).*/\1/g' kiwix-lib-4.0.1/build/build.ninja
 	cd kiwix-lib-4.0.1; ninja -C build
 	mkdir -p kiwixlibbuild/lib kiwixlibbuild/include
+	cp kiwix-lib-4.0.1/build/src/libkiwix.so kiwixlibbuild/lib
+	cp -ar kiwix-lib-4.0.1/include kiwixlibbuild/
 
 demo_file_api.js: kiwixlibbuild demo_file_api.cpp prejs_file_api.js postjs_file_api.js
 	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so -Ilibzimbuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080

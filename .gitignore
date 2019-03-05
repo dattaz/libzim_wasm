@@ -17,6 +17,7 @@
 /aria2*/
 /aria2-*.tar.gz
 /kiwix-lib*/
+/kiwixlib*/
 /kiwix-lib-*.tar.gz
 /curl*/
 /curl-*.tar.gz
