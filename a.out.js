@@ -18,7 +18,9 @@ var Module = typeof Module !== 'undefined' ? Module : {};
 if (typeof (Module) === "undefined") Module = {};
 self.addEventListener('message', function(e) {
     var files = e.data.files;
+    var reader = e.data.reader;
     var action = e.data.action;
+    var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
     if (action === "init") {        
         console.log(files[0].name);
@@ -31,9 +33,24 @@ self.addEventListener('message', function(e) {
             //FS.createLazyFile('/', "tmp.zim", "wiktionary_en_all_2017-03.zim", true, false);
         };
     }
-    else {
-        var url = e.data.url;
+    else if (action === "getArticleContentByUrl") {
         var content = Module.getArticleContentByUrl("/work/" + files[0].name, url);
+        outgoingMessagePort.postMessage(content);
+    }
+    else if (action === "getArticleCount") {
+        var articleCount = Module.getArticleCount("/work/" + files[0].name);
+        outgoingMessagePort.postMessage(articleCount);
+    }
+    else if (action === "getReader") {
+        var reader = Module.getReader("/work/" + files[0].name);
+        outgoingMessagePort.postMessage(reader);
+    }
+    else if (action === "getArticleCountFromReader") {
+        var articleCount = Module.getArticleCountFromReader(reader);
+        outgoingMessagePort.postMessage(articleCount);
+    }
+    else if (action === "getEntryFromPath") {
+        var content = Module.getEntryFromPath(reader, url);
         outgoingMessagePort.postMessage(content);
     }
 
@@ -1781,7 +1798,7 @@ var ASM_CONSTS = [];
 
 STATIC_BASE = GLOBAL_BASE;
 
-STATICTOP = STATIC_BASE + 74112;
+STATICTOP = STATIC_BASE + 74304;
 /* global initializers */  __ATINIT__.push({ func: function() { __GLOBAL__I_000101() } }, { func: function() { __GLOBAL__sub_I_demo_file_api_cpp() } }, { func: function() { __GLOBAL__sub_I_libzim_resources_cpp() } }, { func: function() { __GLOBAL__sub_I_htmlparse_cc() } }, { func: function() { __GLOBAL__sub_I_query_cc() } }, { func: function() { __GLOBAL__sub_I_chert_dbstats_cc() } }, { func: function() { __GLOBAL__sub_I_kiwixlib_resources_cpp() } }, { func: function() { ___cxx_global_var_init_249() } }, { func: function() { ___cxx_global_var_init_36() } }, { func: function() { __GLOBAL__sub_I_base64_cpp() } }, { func: function() { __GLOBAL__sub_I_pathTools_cpp() } }, { func: function() { __GLOBAL__sub_I_regexTools_cpp() } }, { func: function() { __GLOBAL__sub_I_otherTools_cpp() } }, { func: function() { __GLOBAL__sub_I_bind_cpp() } }, { func: function() { ___emscripten_environ_constructor() } }, { func: function() { __GLOBAL__sub_I_iostream_cpp() } });
 
 
@@ -1790,7 +1807,7 @@ STATICTOP = STATIC_BASE + 74112;
 
 
 
-var STATIC_BUMP = 74112;
+var STATIC_BUMP = 74304;
 Module["STATIC_BASE"] = STATIC_BASE;
 Module["STATIC_BUMP"] = STATIC_BUMP;
 
@@ -6851,9 +6868,9 @@ function nullFunc_viijii(x) { err("Invalid function pointer called with signatur
 
 function nullFunc_vij(x) { err("Invalid function pointer called with signature 'vij'. Perhaps this is an invalid value (e.g. caused by calling a virtual method on a NULL pointer)? Or calling a function with an incorrect type, which will fail? (it is worth building your source files with -Werror (warnings are errors), as warnings can indicate undefined behavior which can cause this)");  err("Build with ASSERTIONS=2 for more info.");abort(x) }
 
-Module['wasmTableSize'] = 41308;
+Module['wasmTableSize'] = 41336;
 
-Module['wasmMaxTableSize'] = 41308;
+Module['wasmMaxTableSize'] = 41336;
 
 function invoke_di(index,a1) {
   var sp = stackSave();

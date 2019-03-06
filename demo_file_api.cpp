@@ -45,15 +45,35 @@ int main(int argc, char* argv[])
 }
 
 std::string getArticleContentByUrl(std::string filename, std::string url) {
-    kiwix::Reader reader(filename);
-    unsigned int articleCount = reader.getArticleCount();
-    std::cout << "This ZIM file " << filename << " has " << articleCount << " articles" << std::endl;
     zim::File f(filename);    
     zim::Article article = f.getArticleByUrl(url);
     return article.getData(0).data();
 }
 
+unsigned int getArticleCount(std::string filename) {
+    kiwix::Reader reader(filename);
+    unsigned int articleCount = reader.getArticleCount();
+    return articleCount;
+}
+
+unsigned int getArticleCountFromReader(kiwix::Reader reader) {
+    return reader.getArticleCount();
+}
+
+kiwix::Reader getReader(std::string filename) {
+    kiwix::Reader reader(filename);
+    return reader;
+}
+
+kiwix::Entry getEntryFromPath(kiwix::Reader reader, std::string url){
+    return reader.getEntryFromPath(url);
+}
+
 // Binding code
 EMSCRIPTEN_BINDINGS(my_class_example) {
     emscripten::function("getArticleContentByUrl", &getArticleContentByUrl);
+    emscripten::function("getArticleCount", &getArticleCount);
+    emscripten::function("getReader", &getReader);
+    emscripten::function("getArticleCountFromReader", &getArticleCountFromReader);
+    emscripten::function("getEntryFromPath", &getEntryFromPath);
 }
