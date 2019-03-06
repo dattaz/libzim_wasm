@@ -1,5 +1,6 @@
 #include <zim/file.h>
 #include <zim/fileiterator.h>
+#include <reader.h>
 #include <iostream>
 #include <chrono>
 #include <emscripten/bind.h>
@@ -44,12 +45,15 @@ int main(int argc, char* argv[])
 }
 
 std::string getArticleContentByUrl(std::string filename, std::string url) {
-    zim::File f(filename);
+    kiwix::Reader reader(filename);
+    unsigned int articleCount = reader.getArticleCount();
+    std::cout << "This ZIM file " << filename << " has " << articleCount << " articles" << std::endl;
+    zim::File f(filename);    
     zim::Article article = f.getArticleByUrl(url);
     return article.getData(0).data();
 }
 
 // Binding code
 EMSCRIPTEN_BINDINGS(my_class_example) {
-    function("getArticleContentByUrl", &getArticleContentByUrl);
+    emscripten::function("getArticleContentByUrl", &getArticleContentByUrl);
 }
