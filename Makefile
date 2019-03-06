@@ -75,7 +75,7 @@ mustachebuild :
 	sed -i -e 's/g++ /em++ /g' Mustache-3.2.1/Makefile
 	sed -i -e 's/.\/mustache//g' Mustache-3.2.1/Makefile
 	cd Mustache-3.2.1; make
-	mkdir -p mustachbuild/lib mustachebuild/include
+	mkdir -p mustachebuild/lib mustachebuild/include
 	cp Mustache-3.2.1/mustache.hpp mustachebuild/include
 	cp Mustache-3.2.1/mustache mustachebuild/lib
 
