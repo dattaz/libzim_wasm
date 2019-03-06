@@ -70,10 +70,15 @@ kiwix::Entry getEntryFromPath(kiwix::Reader reader, std::string url){
 }
 
 // Binding code
-EMSCRIPTEN_BINDINGS(my_class_example) {
+EMSCRIPTEN_BINDINGS(kiwix_module) {
     emscripten::function("getArticleContentByUrl", &getArticleContentByUrl);
     emscripten::function("getArticleCount", &getArticleCount);
     emscripten::function("getReader", &getReader);
     emscripten::function("getArticleCountFromReader", &getArticleCountFromReader);
     emscripten::function("getEntryFromPath", &getEntryFromPath);
+    emscripten::class_<kiwix::Reader>("Reader")
+    .constructor<std::string>()
+    .function("getArticleCount", &kiwix::Reader::getArticleCount)
+    .function("getEntryFromPath", &kiwix::Reader::getEntryFromPath)
+    ;
 }

@@ -1,7 +1,8 @@
 if (typeof (Module) === "undefined") Module = {};
+var reader;
 self.addEventListener('message', function(e) {
     var files = e.data.files;
-    var reader = e.data.reader;
+    //var reader = e.data.reader;
     var action = e.data.action;
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
@@ -25,15 +26,15 @@ self.addEventListener('message', function(e) {
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "getReader") {
-        var reader = Module.getReader("/work/" + files[0].name);
+        reader = Module.getReader("/work/" + files[0].name);
         outgoingMessagePort.postMessage(reader);
     }
     else if (action === "getArticleCountFromReader") {
-        var articleCount = Module.getArticleCountFromReader(reader);
+        var articleCount = reader.getArticleCount();
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "getEntryFromPath") {
-        var content = Module.getEntryFromPath(reader, url);
+        var content = reader.getEntryFromPath(url);
         outgoingMessagePort.postMessage(content);
     }
 
