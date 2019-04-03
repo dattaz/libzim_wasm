@@ -97,8 +97,8 @@ kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	sed -i -e 's/ cc / emcc /g' kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's#\(build all: phony \).*\(src/libkiwix.so......\).*#\1\2#' kiwix-lib-4.0.1/build/build.ninja
 	# Depending on the environment, the parameters can be surrounded by quotes or not
-	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/mustachebuild\/include' '-I..\/..\/curlbuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
-	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include -I..\/..\/mustachebuild\/include -I..\/..\/curlbuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/'-Iinclude'/'-Iinclude' '-Istatic' '-I..\/..\/libzimbuild\/include' '-I..\/..\/pugixmlbuild\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/mustachebuild\/include' '-I..\/..\/curlbuild\/include'/g" kiwix-lib-4.0.1/build/build.ninja
+	sed -i -e "s/ -Iinclude / -Iinclude -Istatic -I..\/..\/libzimbuild\/include -I..\/..\/pugixmlbuild\/include -I..\/..\/icubuild\/include -I..\/..\/mustachebuild\/include -I..\/..\/curlbuild\/include /g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ '-I\/usr\/include\/x86_64-linux-gnu'//g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e "s/ -I\/usr\/include\/x86_64-linux-gnu //g" kiwix-lib-4.0.1/build/build.ninja
 	sed -i -e 's/'-Wnon-virtual-dtor'//g' kiwix-lib-4.0.1/build/build.ninja
