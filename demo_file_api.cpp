@@ -4,81 +4,65 @@
 #include <iostream>
 #include <chrono>
 #include <emscripten/bind.h>
+#include <emscripten/emscripten.h>
 
 using namespace emscripten;
 
+// This wrapper is a workaround for the fact that the Reader class does not have any default constructor with no parameter
+class KiwixReaderWrapper
+{
+  public:
+    KiwixReaderWrapper()
+    {
+    }
+
+    kiwix::Reader *_reader;
+};
+
+// This singleton instance is initialized once, and kept for subsequent function calls
+KiwixReaderWrapper readerWrapper;
+
 int main(int argc, char* argv[])
 {
-    std::cout << "libzim initialized" << std::endl;
+    std::cout << "wasm initialized" << std::endl;
     return 0;
-//  try
-//  {
-//    //std::string filename = "tmp.zim"; //"meta.esperanto.stackexchange.com_eng_all_2017-05.zim";
-//    std::string filename = argv[1];
-//    std::cout << "will print first 10 url/title of " << filename << std::endl;
-//    zim::File f(filename);
-//    std::cout << "file size : " << f.getFilesize() << std::endl;
-//    int i=0;
-//    for (zim::File::const_iterator it = f.begin(); it != f.end() && i<10; ++it)
-//    {
-//      if (it->getNamespace() == 'A' && !it->isRedirect()) {
-//          std::cout << "url: " << it->getUrl() << " title: " << it->getTitle() << '\n';
-//          std::string articleUrl = it->getUrl();
-//          high_resolution_clock::time_point t1 = high_resolution_clock::now();
-//          zim::Article article = f.getArticleByUrl("A/" + articleUrl);
-//          std::cout << "article " << articleUrl << " size : " << article.getArticleSize() << '\n';
-//          std::cout << "beginning of article " << articleUrl << " : " << '\n';
-//          printf("%.*s\n", 30, article.getData(0).data());
-//          high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//          auto duration = duration_cast<milliseconds>( t2 - t1 ).count();
-//          std::cout << "read in " << duration << " milliseconds " << '\n';
-//          i++;
-//      }
-//    }
-//    std::string articleUrl = "A/Baby_Grand.html";
-//    
-//  }
-//  catch (const std::exception& e)
-//  {
-//    std::cerr << e.what() << std::endl;
-//  }
 }
 
+// Get ArticleCount by URL (with libzim)
 std::string getArticleContentByUrl(std::string filename, std::string url) {
     zim::File f(filename);    
     zim::Article article = f.getArticleByUrl(url);
     return article.getData(0).data();
 }
 
+// Get article count of a ZIM file (with kiwix-lib)
 unsigned int getArticleCount(std::string filename) {
     kiwix::Reader reader(filename);
     unsigned int articleCount = reader.getArticleCount();
     return articleCount;
 }
 
-unsigned int getArticleCountFromReader(kiwix::Reader reader) {
-    return reader.getArticleCount();
+// Get article count of a ZIM file (with kiwix-lib, using the ReaderWrapper singleton)
+unsigned int getArticleCountFromReader() {
+    return readerWrapper._reader->getArticleCount();
 }
 
-kiwix::Reader getReader(std::string filename) {
+// Initialize the ReaderWrapper singleton
+void initReader(std::string filename) {
     kiwix::Reader reader(filename);
-    return reader;
+    readerWrapper._reader = &reader;
 }
 
-kiwix::Entry getEntryFromPath(kiwix::Reader reader, std::string url){
-    return reader.getEntryFromPath(url);
+// Get a Kiwix Entry from its URL (with kiwix-lib, using the ReaderWrapper singleton)
+kiwix::Entry getEntryFromPath(std::string url){
+    return readerWrapper._reader->getEntryFromPath(url);
 }
 
 // Binding code
 EMSCRIPTEN_BINDINGS(kiwix_module) {
     emscripten::function("getArticleContentByUrl", &getArticleContentByUrl);
     emscripten::function("getArticleCount", &getArticleCount);
-    emscripten::function("getReader", &getReader);
+    emscripten::function("initReader", &initReader);
     emscripten::function("getArticleCountFromReader", &getArticleCountFromReader);
     emscripten::function("getEntryFromPath", &getEntryFromPath);
-    emscripten::class_<kiwix::Reader>("Reader")
-    .constructor<std::string>()
-    .function("getArticleCount", &kiwix::Reader::getArticleCount)
-    .function("getEntryFromPath", &kiwix::Reader::getEntryFromPath)
-    ;
 }

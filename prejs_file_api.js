@@ -1,8 +1,7 @@
 if (typeof (Module) === "undefined") Module = {};
-var reader;
+Module['onRuntimeInitialized'] = function() { console.log("runtime initialized"); };
 self.addEventListener('message', function(e) {
     var files = e.data.files;
-    //var reader = e.data.reader;
     var action = e.data.action;
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
@@ -25,12 +24,12 @@ self.addEventListener('message', function(e) {
         var articleCount = Module.getArticleCount("/work/" + files[0].name);
         outgoingMessagePort.postMessage(articleCount);
     }
-    else if (action === "getReader") {
-        reader = Module.getReader("/work/" + files[0].name);
-        outgoingMessagePort.postMessage(reader);
+    else if (action === "initReader") {
+        Module.initReader("/work/" + files[0].name);
+        outgoingMessagePort.postMessage("ok");
     }
     else if (action === "getArticleCountFromReader") {
-        var articleCount = reader.getArticleCount();
+        var articleCount = Module.getArticleCountFromReader();
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "getEntryFromPath") {
