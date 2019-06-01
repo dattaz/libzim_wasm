@@ -33,7 +33,7 @@ self.addEventListener('message', function(e) {
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "getEntryFromPathAndReader") {
-        var content = reader.getEntryFromPathAndReader(url);
+        var content = Module.getEntryFromPathAndReader(url);
         outgoingMessagePort.postMessage(content);
     }
 
