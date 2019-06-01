@@ -22,6 +22,6 @@ sudo docker build -t "docker-emscripten-libzim:v1" .
 ```
  - Run the build with :
 ```
-sudo docker run --rm -v $(pwd):/src -t docker-emscripten-libzim:v1 make
+sudo docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/root/.emscripten_cache -t docker-emscripten-libzim:v1 make
 ```
 (please note that, in this case, the generated files will be owned by root after compiling, you might need to chown them afterwards)
