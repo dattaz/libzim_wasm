@@ -28,13 +28,6 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-// Get ArticleCount by URL (with libzim)
-std::string getArticleContentByUrl(std::string filename, std::string url) {
-    zim::File f(filename);    
-    zim::Article article = f.getArticleByUrl(url);
-    return article.getData(0).data();
-}
-
 // Get article count of a ZIM file (with kiwix-lib)
 unsigned int getArticleCount(std::string filename) {
     kiwix::Reader reader(filename);
@@ -42,9 +35,11 @@ unsigned int getArticleCount(std::string filename) {
     return articleCount;
 }
 
-// Get article count of a ZIM file (with kiwix-lib, using the ReaderWrapper singleton)
-unsigned int getArticleCountFromReader() {
-    return readerWrapper._reader->getArticleCount();
+// Get ArticleContent by URL (with libzim)
+std::string getArticleContentByUrl(std::string filename, std::string url) {
+    zim::File f(filename);    
+    zim::Article article = f.getArticleByUrl(url);
+    return article.getData(0).data();
 }
 
 // Initialize the ReaderWrapper singleton
@@ -53,8 +48,13 @@ void initReader(std::string filename) {
     readerWrapper._reader = &reader;
 }
 
+// Get article count of a ZIM file (with kiwix-lib, using the ReaderWrapper singleton)
+unsigned int getArticleCountFromReader() {
+    return readerWrapper._reader->getArticleCount();
+}
+
 // Get a Kiwix Entry from its URL (with kiwix-lib, using the ReaderWrapper singleton)
-kiwix::Entry getEntryFromPath(std::string url){
+kiwix::Entry getEntryFromPathAndReader(std::string url){
     return readerWrapper._reader->getEntryFromPath(url);
 }
 
@@ -64,5 +64,5 @@ EMSCRIPTEN_BINDINGS(kiwix_module) {
     emscripten::function("getArticleCount", &getArticleCount);
     emscripten::function("initReader", &initReader);
     emscripten::function("getArticleCountFromReader", &getArticleCountFromReader);
-    emscripten::function("getEntryFromPath", &getEntryFromPath);
+    emscripten::function("getEntryFromPathAndReader", &getEntryFromPathAndReader);
 }
