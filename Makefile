@@ -15,8 +15,8 @@ z :
 	cd zlib-1.2.11 ; emmake make install
 	
 icubuild : 
-	wget http://download.icu-project.org/files/icu4c/63.1/icu4c-63_1-src.tgz
-	tar xf icu4c-63_1-src.tgz
+	wget https://github.com/unicode-org/icu/releases/download/release-63-2/icu4c-63_2-src.tgz
+	tar xf icu4c-63_2-src.tgz
 	# Quick and dirty way to make ICU handle Double-conversion, and to skip unnecessary compilation steps
 	cd icu ; patch -p1 <../patch_icu_for_emscripten.patch
 	cd icu/source ; emconfigure ./configure --prefix=`pwd`/../../icubuild
