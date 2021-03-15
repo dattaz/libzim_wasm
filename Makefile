@@ -118,7 +118,7 @@ clean_dependencies :
 	rm -rf xz-5.2.4 xz-5.2.4.tar.gz*
 	rm -rf zlib-1.2.11 zlib-1.2.11.tar.gz*
 	rm -rf xapian-core-1.4.10 xapian-core-1.4.10.tar.xz*
-	rm -rf icu icu4c-63_1-src.tgz*
+	rm -rf icu icu4c-63_2-src.tgz*
 	rm -rf pugixml-1.9 pugixml-1.9.tar.gz*
 	rm -rf aria2-release-1.34.0 aria2-release-1.34.0.tar.gz*
 	rm -rf curl-curl-7_64_0 curl-7_64_0.tar.gz*
