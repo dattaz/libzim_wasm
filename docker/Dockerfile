@@ -1,3 +1,4 @@
+# Docker image suitable to build libzim & kiwixlib with emscripten
 FROM emscripten/emsdk:2.0.15
 
 # Install build tools
