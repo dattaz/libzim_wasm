@@ -106,7 +106,7 @@ kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	sed -i -e "s/ -I\/usr\/include\/x86_64-linux-gnu //g" libkiwix-4.0.1/build/build.ninja
 	sed -i -e 's/'-Wnon-virtual-dtor'//g' libkiwix-4.0.1/build/build.ninja
 	sed -i -e 's/-Wnon-virtual-dtor//g' libkiwix-4.0.1/build/build.ninja
-	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib/g' libkiwix-4.0.1/build/build.ninja
+	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/libzimbuild\/lib -L..\/..\/pugixmlbuild\/lib -L..\/..\/icubuild\/lib -L..\/..\/curlbuild\/lib/g' libkiwix-4.0.1/build/build.ninja
 	sed -i -e 's/^\(build all: phony src\/libkiwix.so.4.0.1\).*/\1/g' libkiwix-4.0.1/build/build.ninja
 	cd libkiwix-4.0.1; ninja -C build
 	mkdir -p kiwixlibbuild/lib kiwixlibbuild/include
@@ -114,7 +114,7 @@ kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	cp -ar libkiwix-4.0.1/include kiwixlibbuild/
 
 demo_file_api.js: kiwixlibbuild demo_file_api.cpp prejs_file_api.js postjs_file_api.js
-	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so kiwixlibbuild/lib/libkiwix.so -Ilibzimbuild/include -Ikiwixlibbuild/include -Iicubuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080
+	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so kiwixlibbuild/lib/libkiwix.so -Ilibzimbuild/include -Ikiwixlibbuild/include -Iicubuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080
 
 clean_dependencies :
 	rm -rf lzma z icubuild xapian pugixmlbuild aria2build mustachebuild curlbuild
