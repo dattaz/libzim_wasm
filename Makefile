@@ -46,6 +46,7 @@ libzimbuild : lzma z icubuild xapian
 	sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/lzma\/include' '-I..\/..\/z\/include' '-I..\/..\/icubuild\/include' '-I..\/..\/xapian\/include'/g" libzim-4.0.5/build/build.ninja
 	sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/lzma\/include -I..\/..\/z\/include -I..\/..\/icubuild\/include -I..\/..\/xapian\/include /g" libzim-4.0.5/build/build.ninja
 	sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/lzma\/lib -L..\/..\/z\/lib -L..\/..\/icubuild\/lib -L..\/..\/xapian\/lib/g' libzim-4.0.5/build/build.ninja
+	sed -i -e 's/-Wl,--as-needed -Wl,--no-undefined //g' libzim-4.0.5/build/build.ninja
 	# Quick and dirty way to disable MMAP
 	cd libzim-4.0.5 ; patch -p1 <../patch_libzim_for_emscripten.patch
 	cd libzim-4.0.5; ninja -C build
