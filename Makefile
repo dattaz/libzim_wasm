@@ -26,6 +26,8 @@ icubuild :
 xapian : z
 	wget https://oligarchy.co.uk/xapian/1.4.10/xapian-core-1.4.10.tar.xz
 	tar xf xapian-core-1.4.10.tar.xz
+	# Quick and dirty way to make xapian compile with emscripten
+	sed -i -e 's/^#include "unicode\/description_append.cc"//' xapian-core-1.4.10/bin/xapian-delve.cc
 	cd xapian-core-1.4.10; emconfigure ./configure --prefix=`pwd`/../xapian "CFLAGS=-I`pwd`/../z/include -L`pwd`/../z/lib" "CXXFLAGS=-I`pwd`/../z/include -L`pwd`/../z/lib" --disable-backend-remote
 	cd xapian-core-1.4.10; emmake make "CFLAGS=-I`pwd`/../z/include -L`pwd`/../z/lib -std=c++11" "CXXFLAGS=-I`pwd`/../z/include -L`pwd`/../z/lib -std=c++11"
 	cd xapian-core-1.4.10; emmake make install
