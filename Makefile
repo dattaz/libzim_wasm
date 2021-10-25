@@ -114,7 +114,7 @@ kiwixlibbuild : libzimbuild pugixmlbuild mustachebuild curlbuild
 	cp -ar libkiwix-4.0.1/include kiwixlibbuild/
 
 demo_file_api.js: kiwixlibbuild demo_file_api.cpp prejs_file_api.js postjs_file_api.js
-	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so kiwixlibbuild/lib/libkiwix.so -Ilibzimbuild/include -Ikiwixlibbuild/include -Iicubuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080 -s USE_PTHREADS=0 -lworkerfs.js
+	em++ --bind demo_file_api.cpp libzimbuild/lib/libzim.so kiwixlibbuild/lib/libkiwix.so -Ilibzimbuild/include -Ikiwixlibbuild/include -Iicubuild/include -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g -D_LARGEFILE64_SOURCE=1 -D_FILE_OFFSET_BITS=64 -pthread --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','ALLOC_STATIC','ALLOC_DYNAMIC','ALLOC_NONE','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080 -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=0 -lworkerfs.js
 
 clean_dependencies :
 	rm -rf lzma z icubuild xapian pugixmlbuild aria2build mustachebuild curlbuild
