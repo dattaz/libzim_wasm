@@ -68,7 +68,7 @@ curlbuild :
 	wget -O curl-7_64_0.tar.gz https://github.com/curl/curl/archive/curl-7_64_0.tar.gz
 	tar xf curl-7_64_0.tar.gz
 	cd curl-curl-7_64_0; ./buildconf
-	cd curl-curl-7_64_0; emconfigure ./configure --prefix=`pwd`/../curlbuild
+	cd curl-curl-7_64_0; emconfigure ./configure --prefix=`pwd`/../curlbuild --disable-shared
 	cd curl-curl-7_64_0; emmake make
 	cd curl-curl-7_64_0; emmake make install
 
