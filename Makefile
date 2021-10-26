@@ -43,13 +43,6 @@ build/lib/libzim.a : build/lib/liblzma.so build/lib/libz.a build/lib/libzstd.a b
 	# It's no use trying to compile examples
 	sed -i -e "s/^subdir('examples')//" libzim-6.3.2/meson.build
 	cd libzim-6.3.2; PKG_CONFIG_PATH=/src/build/lib/pkgconfig meson --prefix=`pwd`/../build --cross-file=../emscripten-crosscompile.ini . build -DUSE_MMAP=false
-	# Remove unnecessary compilation steps
-	sed -i -e 's#\(build all: phony \).*\(src/libzim.so...... \).*#\1\2#' libzim-6.3.2/build/build.ninja
-	# Depending on the environment, the parameters can be surrounded by quotes or not
-	#sed -i -e "s/'-Iinclude'/'-Iinclude' '-I..\/..\/build\/include'/g" libzim-6.3.2/build/build.ninja
-	#sed -i -e "s/ -Iinclude / -Iinclude -I..\/..\/build\/include /g" libzim-6.3.2/build/build.ninja
-	#sed -i -e 's/^\( LINK_ARGS =.*\)/\1 -L..\/..\/build\/lib/g' libzim-6.3.2/build/build.ninja
-	#sed -i -e 's/-Wl,--as-needed -Wl,--no-undefined //g' libzim-6.3.2/build/build.ninja
 	# Quick and dirty way   
 	cd libzim-6.3.2 ; patch -p1 -F5 <../patch_libzim_for_emscripten.patch
 	cd libzim-6.3.2; ninja -C build
