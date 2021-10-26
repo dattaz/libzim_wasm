@@ -16,12 +16,11 @@ sudo apt install zlib1g-dev libicu-dev libxapian-dev liblzma-dev
 
 ## Steps to recompile with Docker
 While being at the root of this repository :
- - Build the Docker image with the provided Dockerfile (based on https://hub.docker.com/r/apiaryio/emcc/ , which is based on Debian) :
+ - Build the Docker image with the provided Dockerfile (based on https://hub.docker.com/r/emscripten/emsdk , which is based on Debian) :
 ```
-sudo docker build -t "docker-emscripten-libzim:v1" .
+docker build -t "docker-emscripten-libzim:v2" ./docker
 ```
  - Run the build with :
 ```
-sudo docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/root/.emscripten_cache -t docker-emscripten-libzim:v1 make
+docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v2 make
 ```
-(please note that, in this case, the generated files will be owned by root after compiling, you might need to chown them afterwards)
