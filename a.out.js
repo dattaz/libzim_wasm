@@ -43,18 +43,6 @@ self.addEventListener('message', function(e) {
         var articleCount = Module.getArticleCount("/work/" + files[0].name);
         outgoingMessagePort.postMessage(articleCount);
     }
-    else if (action === "initReader") {
-        Module.initReader("/work/" + files[0].name);
-        outgoingMessagePort.postMessage("ok");
-    }
-    else if (action === "getArticleCountFromReader") {
-        var articleCount = Module.getArticleCountFromReader();
-        outgoingMessagePort.postMessage(articleCount);
-    }
-    else if (action === "getEntryFromPathAndReader") {
-        var content = Module.getEntryFromPathAndReader(url);
-        outgoingMessagePort.postMessage(content);
-    }
 
 
 
@@ -1889,6 +1877,10 @@ var ASM_CONSTS = {
       return demangleAll(js);
     }
 
+  function ___assert_fail(condition, filename, line, func) {
+      abort('Assertion failed: ' + UTF8ToString(condition) + ', at: ' + [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function']);
+    }
+
   function ___cxa_allocate_exception(size) {
       // Thrown object is prepended by exception metadata block
       return _malloc(size + 16) + 16;
@@ -2041,8 +2033,6 @@ var ASM_CONSTS = {
       return catchInfo.get_exception_ptr();
     }
 
-  var exceptionLast = 0;
-  
   function ___cxa_free_exception(ptr) {
       try {
         return _free(new ExceptionInfo(ptr).ptr);
@@ -2063,6 +2053,12 @@ var ASM_CONSTS = {
         ___cxa_free_exception(info.excPtr);
       }
     }
+  function ___cxa_decrement_exception_refcount(ptr) {
+      if (!ptr) return;
+      exception_decRef(new ExceptionInfo(ptr));
+    }
+
+  var exceptionLast = 0;
   function ___cxa_end_catch() {
       // Clear state flag.
       _setThrew(0);
@@ -2153,6 +2149,11 @@ var ASM_CONSTS = {
     }
 
 
+  function ___cxa_increment_exception_refcount(ptr) {
+      if (!ptr) return;
+      exception_addRef(new ExceptionInfo(ptr));
+    }
+
   function ___cxa_rethrow() {
       var catchInfo = exceptionCaught.pop();
       if (!catchInfo) {
@@ -2173,6 +2174,16 @@ var ASM_CONSTS = {
       throw ptr;
     }
 
+  function ___cxa_rethrow_primary_exception(ptr) {
+      if (!ptr) return;
+      var catchInfo = new CatchInfo();
+      catchInfo.set_base_ptr(ptr);
+      var info = catchInfo.get_exception_info();
+      exceptionCaught.push(catchInfo);
+      info.set_rethrown(true);
+      ___cxa_rethrow();
+    }
+
   function ___cxa_throw(ptr, type, destructor) {
       var info = new ExceptionInfo(ptr);
       // Initialize ExceptionInfo content after it was allocated in __cxa_allocate_exception.
@@ -2187,11 +2198,6 @@ var ASM_CONSTS = {
     }
 
 
-  function setErrNo(value) {
-      HEAP32[((___errno_location())>>2)] = value;
-      return value;
-    }
-  
   var PATH = {splitPath:function(filename) {
         var splitPathRe = /^(\/?|)([\s\S]*?)((?:\.{1,2}|[^\/]+?|)(\.[^.\/]*|))(?:[\/]*)$/;
         return splitPathRe.exec(filename).slice(1);
@@ -2485,11 +2491,7 @@ var ASM_CONSTS = {
       return Math.ceil(size / alignment) * alignment;
     }
   function mmapAlloc(size) {
-      size = alignMemory(size, 65536);
-      var ptr = _memalign(65536, size);
-      if (!ptr) return 0;
-      zeroMemory(ptr, size);
-      return ptr;
+      abort('internal error: mmapAlloc called but `memalign` native symbol not exported');
     }
   var MEMFS = {ops_table:null,mount:function(mount) {
         return MEMFS.createNode(null, '/', 16384 | 511 /* 0777 */, 0);
@@ -4675,121 +4677,10 @@ var ASM_CONSTS = {
         else assert(high === -1);
         return low;
       }};
-  function ___syscall_fcntl64(fd, cmd, varargs) {SYSCALLS.varargs = varargs;
-  try {
-  
-      var stream = SYSCALLS.getStreamFromFD(fd);
-      switch (cmd) {
-        case 0: {
-          var arg = SYSCALLS.get();
-          if (arg < 0) {
-            return -28;
-          }
-          var newStream;
-          newStream = FS.open(stream.path, stream.flags, 0, arg);
-          return newStream.fd;
-        }
-        case 1:
-        case 2:
-          return 0;  // FD_CLOEXEC makes no sense for a single process.
-        case 3:
-          return stream.flags;
-        case 4: {
-          var arg = SYSCALLS.get();
-          stream.flags |= arg;
-          return 0;
-        }
-        case 12:
-        /* case 12: Currently in musl F_GETLK64 has same value as F_GETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */ {
-          
-          var arg = SYSCALLS.get();
-          var offset = 0;
-          // We're always unlocked.
-          HEAP16[(((arg)+(offset))>>1)] = 2;
-          return 0;
-        }
-        case 13:
-        case 14:
-        /* case 13: Currently in musl F_SETLK64 has same value as F_SETLK, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
-        /* case 14: Currently in musl F_SETLKW64 has same value as F_SETLKW, so omitted to avoid duplicate case blocks. If that changes, uncomment this */
-          
-          
-          return 0; // Pretend that the locking is successful.
-        case 16:
-        case 8:
-          return -28; // These are for sockets. We don't have them fully implemented yet.
-        case 9:
-          // musl trusts getown return values, due to a bug where they must be, as they overlap with errors. just return -1 here, so fnctl() returns that, and we set errno ourselves.
-          setErrNo(28);
-          return -1;
-        default: {
-          return -28;
-        }
-      }
-    } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
-    return -e.errno;
-  }
-  }
-
   function ___syscall_fstat64(fd, buf) {try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
       return SYSCALLS.doStat(FS.stat, stream.path, buf);
-    } catch (e) {
-    if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
-    return -e.errno;
-  }
-  }
-
-  function ___syscall_ioctl(fd, op, varargs) {SYSCALLS.varargs = varargs;
-  try {
-  
-      var stream = SYSCALLS.getStreamFromFD(fd);
-      switch (op) {
-        case 21509:
-        case 21505: {
-          if (!stream.tty) return -59;
-          return 0;
-        }
-        case 21510:
-        case 21511:
-        case 21512:
-        case 21506:
-        case 21507:
-        case 21508: {
-          if (!stream.tty) return -59;
-          return 0; // no-op, not actually adjusting terminal settings
-        }
-        case 21519: {
-          if (!stream.tty) return -59;
-          var argp = SYSCALLS.get();
-          HEAP32[((argp)>>2)] = 0;
-          return 0;
-        }
-        case 21520: {
-          if (!stream.tty) return -59;
-          return -28; // not supported
-        }
-        case 21531: {
-          var argp = SYSCALLS.get();
-          return FS.ioctl(stream, op, argp);
-        }
-        case 21523: {
-          // TODO: in theory we should write to the winsize struct that gets
-          // passed in, but for now musl doesn't read anything on it
-          if (!stream.tty) return -59;
-          return 0;
-        }
-        case 21524: {
-          // TODO: technically, this ioctl call should change the window size.
-          // but, since emscripten doesn't have any concept of a terminal window
-          // yet, we'll just silently throw it away as we do TIOCGWINSZ
-          if (!stream.tty) return -59;
-          return 0;
-        }
-        default: abort('bad ioctl syscall ' + op);
-      }
     } catch (e) {
     if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
     return -e.errno;
@@ -5811,12 +5702,6 @@ var ASM_CONSTS = {
       return 0;
     }
 
-  function _exit(status) {
-      // void _exit(int status);
-      // http://pubs.opengroup.org/onlinepubs/000095399/functions/exit.html
-      exit(status);
-    }
-
   function _fd_close(fd) {try {
   
       var stream = SYSCALLS.getStreamFromFD(fd);
@@ -6261,15 +6146,6 @@ var ASM_CONSTS = {
       return _strftime(s, maxsize, format, tm); // no locale support yet
     }
 
-  function _time(ptr) {
-      ;
-      var ret = (Date.now()/1000)|0;
-      if (ptr) {
-        HEAP32[((ptr)>>2)] = ret;
-      }
-      return ret;
-    }
-
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
       parent = this;  // root node sets parent to itself
@@ -6474,20 +6350,22 @@ function intArrayToString(array) {
 
 
 var asmLibraryArg = {
+  "__assert_fail": ___assert_fail,
   "__cxa_allocate_exception": ___cxa_allocate_exception,
   "__cxa_atexit": ___cxa_atexit,
   "__cxa_begin_catch": ___cxa_begin_catch,
+  "__cxa_decrement_exception_refcount": ___cxa_decrement_exception_refcount,
   "__cxa_end_catch": ___cxa_end_catch,
   "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2,
   "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3,
   "__cxa_free_exception": ___cxa_free_exception,
+  "__cxa_increment_exception_refcount": ___cxa_increment_exception_refcount,
   "__cxa_rethrow": ___cxa_rethrow,
+  "__cxa_rethrow_primary_exception": ___cxa_rethrow_primary_exception,
   "__cxa_throw": ___cxa_throw,
   "__cxa_uncaught_exceptions": ___cxa_uncaught_exceptions,
   "__resumeException": ___resumeException,
-  "__syscall_fcntl64": ___syscall_fcntl64,
   "__syscall_fstat64": ___syscall_fstat64,
-  "__syscall_ioctl": ___syscall_ioctl,
   "__syscall_open": ___syscall_open,
   "_embind_register_bigint": __embind_register_bigint,
   "_embind_register_bool": __embind_register_bool,
@@ -6504,7 +6382,6 @@ var asmLibraryArg = {
   "emscripten_resize_heap": _emscripten_resize_heap,
   "environ_get": _environ_get,
   "environ_sizes_get": _environ_sizes_get,
-  "exit": _exit,
   "fd_close": _fd_close,
   "fd_pread": _fd_pread,
   "fd_read": _fd_read,
@@ -6536,8 +6413,7 @@ var asmLibraryArg = {
   "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii,
   "invoke_viij": invoke_viij,
   "setTempRet0": _setTempRet0,
-  "strftime_l": _strftime_l,
-  "time": _time
+  "strftime_l": _strftime_l
 };
 var asm = createWasm();
 /** @type {function(...*):?} */
@@ -6556,15 +6432,6 @@ var ___errno_location = Module["___errno_location"] = createExportWrapper("__err
 var _free = Module["_free"] = createExportWrapper("free");
 
 /** @type {function(...*):?} */
-var _fflush = Module["_fflush"] = createExportWrapper("fflush");
-
-/** @type {function(...*):?} */
-var _htons = Module["_htons"] = createExportWrapper("htons");
-
-/** @type {function(...*):?} */
-var _ntohs = Module["_ntohs"] = createExportWrapper("ntohs");
-
-/** @type {function(...*):?} */
 var ___getTypeName = Module["___getTypeName"] = createExportWrapper("__getTypeName");
 
 /** @type {function(...*):?} */
@@ -6574,16 +6441,7 @@ var ___embind_register_native_and_builtin_types = Module["___embind_register_nat
 var _emscripten_main_thread_process_queued_calls = Module["_emscripten_main_thread_process_queued_calls"] = createExportWrapper("emscripten_main_thread_process_queued_calls");
 
 /** @type {function(...*):?} */
-var _htonl = Module["_htonl"] = createExportWrapper("htonl");
-
-/** @type {function(...*):?} */
-var __get_tzname = Module["__get_tzname"] = createExportWrapper("_get_tzname");
-
-/** @type {function(...*):?} */
-var __get_daylight = Module["__get_daylight"] = createExportWrapper("_get_daylight");
-
-/** @type {function(...*):?} */
-var __get_timezone = Module["__get_timezone"] = createExportWrapper("_get_timezone");
+var _fflush = Module["_fflush"] = createExportWrapper("fflush");
 
 /** @type {function(...*):?} */
 var stackSave = Module["stackSave"] = createExportWrapper("stackSave");
@@ -6622,10 +6480,19 @@ var ___cxa_can_catch = Module["___cxa_can_catch"] = createExportWrapper("__cxa_c
 var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = createExportWrapper("__cxa_is_pointer_type");
 
 /** @type {function(...*):?} */
-var _memalign = Module["_memalign"] = createExportWrapper("memalign");
+var dynCall_viij = Module["dynCall_viij"] = createExportWrapper("dynCall_viij");
 
 /** @type {function(...*):?} */
-var dynCall_viij = Module["dynCall_viij"] = createExportWrapper("dynCall_viij");
+var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
+
+/** @type {function(...*):?} */
+var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
+
+/** @type {function(...*):?} */
+var dynCall_viijj = Module["dynCall_viijj"] = createExportWrapper("dynCall_viijj");
+
+/** @type {function(...*):?} */
+var dynCall_iijj = Module["dynCall_iijj"] = createExportWrapper("dynCall_iijj");
 
 /** @type {function(...*):?} */
 var dynCall_ij = Module["dynCall_ij"] = createExportWrapper("dynCall_ij");
@@ -6638,18 +6505,6 @@ var dynCall_iiiij = Module["dynCall_iiiij"] = createExportWrapper("dynCall_iiiij
 
 /** @type {function(...*):?} */
 var dynCall_vij = Module["dynCall_vij"] = createExportWrapper("dynCall_vij");
-
-/** @type {function(...*):?} */
-var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
-
-/** @type {function(...*):?} */
-var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
-
-/** @type {function(...*):?} */
-var dynCall_viijj = Module["dynCall_viijj"] = createExportWrapper("dynCall_viijj");
-
-/** @type {function(...*):?} */
-var dynCall_iijj = Module["dynCall_iijj"] = createExportWrapper("dynCall_iijj");
 
 /** @type {function(...*):?} */
 var dynCall_jiji = Module["dynCall_jiji"] = createExportWrapper("dynCall_jiji");
@@ -6670,17 +6525,6 @@ var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall
 var dynCall_viijii = Module["dynCall_viijii"] = createExportWrapper("dynCall_viijii");
 
 
-function invoke_iii(index,a1,a2) {
-  var sp = stackSave();
-  try {
-    return getWasmTableEntry(index)(a1,a2);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
 function invoke_ii(index,a1) {
   var sp = stackSave();
   try {
@@ -6696,6 +6540,17 @@ function invoke_viii(index,a1,a2,a3) {
   var sp = stackSave();
   try {
     getWasmTableEntry(index)(a1,a2,a3);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_iii(index,a1,a2) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;

@@ -1,0 +1,12 @@
+prefix=/src/xapian-core-1.4.18/../build
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Xapian
+Description: Search Engine Library
+URL: https://xapian.org/
+Version: 1.4.18
+Cflags: -I${includedir} 
+Libs:  -L${libdir} -lxapian
+Libs.private:   -lz 

@@ -24,16 +24,4 @@ self.addEventListener('message', function(e) {
         var articleCount = Module.getArticleCount("/work/" + files[0].name);
         outgoingMessagePort.postMessage(articleCount);
     }
-    else if (action === "initReader") {
-        Module.initReader("/work/" + files[0].name);
-        outgoingMessagePort.postMessage("ok");
-    }
-    else if (action === "getArticleCountFromReader") {
-        var articleCount = Module.getArticleCountFromReader();
-        outgoingMessagePort.postMessage(articleCount);
-    }
-    else if (action === "getEntryFromPathAndReader") {
-        var content = Module.getEntryFromPathAndReader(url);
-        outgoingMessagePort.postMessage(content);
-    }
 

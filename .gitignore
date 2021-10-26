@@ -4,10 +4,13 @@
 /lzma/
 /zlib-*/
 /z/
+/zstd-*/
+/zstd/
 /xz-*/
 /xz-*.tar.gz*
 /icu4c-*.tgz*
 /zlib-*.tar.gz*
+/zstd-*.tar.gz*
 /xapian-core-*.tar.xz*
 /libzim-*.tar.gz
 /xapian*/

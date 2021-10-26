@@ -1,0 +1,10 @@
+prefix=/src/libzim-6.3.2/../build
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libzim
+Description: A Library to zim.
+Version: 6.3.2
+Requires: liblzma, libzstd, xapian-core, icu-i18n
+Libs: -L${libdir} -lzim -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4
+Cflags: -I${includedir} -s USE_PTHREADS=1
