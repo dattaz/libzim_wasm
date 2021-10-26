@@ -24,5 +24,3 @@ docker build -t "docker-emscripten-libzim:v2" ./docker
 ```
 docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v2 make
 ```
-
-(to build more quickly, you can add a `-j4` or `-j6` after the `make` command (match the number of CPU/cores you have)

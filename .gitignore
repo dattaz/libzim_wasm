@@ -1,13 +1,10 @@
 /nbproject/private/
-/icu/
-/icubuild/
-/lzma/
+/build/
 /zlib-*/
-/z/
 /zstd-*/
-/zstd/
 /xz-*/
 /xz-*.tar.gz*
+/icu/
 /icu4c-*.tgz*
 /zlib-*.tar.gz*
 /zstd-*.tar.gz*
