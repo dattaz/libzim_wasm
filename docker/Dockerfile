@@ -12,7 +12,10 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en  
 ENV LC_ALL en_US.UTF-8
 
+# Create the cache directory with the good rights
+RUN mkdir /home/emscripten/.emscripten_cache && chown emscripten:emscripten /home/emscripten/.emscripten_cache
+
 # Indicates that the sources to compile should be mounted in /src when running the container
 VOLUME /src
 # It's better to keep the emscripten cache between builds to improve performance
-VOLUME /root/.emscripten_cache
+VOLUME /home/emscripten/.emscripten_cache

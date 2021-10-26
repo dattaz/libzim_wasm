@@ -22,5 +22,5 @@ docker build -t "docker-emscripten-libzim:v2" ./docker
 ```
  - Run the build with :
 ```
-docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/root/.emscripten_cache -u $(id -u):$(id -g) -t docker-emscripten-libzim:v2 make
+docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v2 make
 ```
