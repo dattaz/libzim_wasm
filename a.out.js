@@ -24,28 +24,27 @@ self.addEventListener('message', function(e) {
     var action = e.data.action;
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
+    // When using split ZIM files, we need to remove the last two letters of the suffix (like .zimaa -> .zim)
     var baseZimFileName = files[0].name.replace(/\.zim..$/, '.zim');
     if (action === "init") {        
-        console.log(files[0].name);
         Module["arguments"] = [];
         for (let i = 0; i < files.length; i++) {
             Module["arguments"].push("/work/" + files[i].name);
         }
-        Module["preInit"] = function() {
+        Module["preRun"] = function() {
             FS.mkdir("/work");
             FS.mount(WORKERFS, {
-                files: files // Array of File objects or FileList
+                files: files
                 }, '/work');
-            //FS.createLazyFile('/', "tmp.zim", "wiktionary_en_all_2017-03.zim", true, false);
         };
+        console.log("baseZimFileName=" + baseZimFileName);
+        console.log('Module["arguments"]=' + Module["arguments"])
     }
     else if (action === "getArticleContentByUrl") {
         var content = Module.getArticleContentByUrl("/work/" + baseZimFileName, url);
         outgoingMessagePort.postMessage(content);
     }
     else if (action === "getArticleCount") {
-        console.log("baseZimFileName=" + baseZimFileName);
-        console.log('Module["arguments"]=' + Module["arguments"])
         var articleCount = Module.getArticleCount("/work/" + baseZimFileName);
         outgoingMessagePort.postMessage(articleCount);
     }
