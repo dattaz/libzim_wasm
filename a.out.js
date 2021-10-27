@@ -22,19 +22,26 @@ self.addEventListener("message", function(e) {
     var action = e.data.action;
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
-    // When using split ZIM files, we need to remove the last two letters of the suffix (like .zimaa -> .zim)
-    var baseZimFileName = files[0].name.replace(/\.zim..$/, '.zim');
-    if (action === "getArticleContentByUrl") {
-        var content = Module.getArticleContentByUrl("/work/" + baseZimFileName, url);
+    if (action === "getContentByUrl") {
+        var content = Module.getContentByUrl(url);
         outgoingMessagePort.postMessage(content);
     }
+    else if (action === "getMimetypeByUrl") {
+        var mimetype = Module.getMimetypeByUrl(url);
+        outgoingMessagePort.postMessage(mimetype);
+    }
     else if (action === "getArticleCount") {
-        var articleCount = Module.getArticleCount("/work/" + baseZimFileName);
+        var articleCount = Module.getArticleCount();
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "init") {
+        // When using split ZIM files, we need to remove the last two letters of the suffix (like .zimaa -> .zim)
+        var baseZimFileName = files[0].name.replace(/\.zim..$/, '.zim');
         Module = {};
-        Module["onRuntimeInitialized"] = function() { console.log("runtime initialized"); };
+        Module["onRuntimeInitialized"] = function() {
+            console.log("runtime initialized");
+            Module.loadArchive("/work/" + baseZimFileName);
+        };
         Module["arguments"] = [];
         for (let i = 0; i < files.length; i++) {
             Module["arguments"].push("/work/" + files[i].name);
@@ -2118,6 +2125,41 @@ var ASM_CONSTS = {
     }
 
   function ___cxa_find_matching_catch_3() {
+      var thrown = exceptionLast;
+      if (!thrown) {
+        // just pass through the null ptr
+        setTempRet0(0); return ((0)|0);
+      }
+      var info = new ExceptionInfo(thrown);
+      var thrownType = info.get_type();
+      var catchInfo = new CatchInfo();
+      catchInfo.set_base_ptr(thrown);
+      catchInfo.set_adjusted_ptr(thrown);
+      if (!thrownType) {
+        // just pass through the thrown ptr
+        setTempRet0(0); return ((catchInfo.ptr)|0);
+      }
+      var typeArray = Array.prototype.slice.call(arguments);
+  
+      // can_catch receives a **, add indirection
+      // The different catch blocks are denoted by different types.
+      // Due to inheritance, those types may not precisely match the
+      // type of the thrown object. Find one which matches, and
+      // return the type of the catch block which should be called.
+      for (var i = 0; i < typeArray.length; i++) {
+        var caughtType = typeArray[i];
+        if (caughtType === 0 || caughtType === thrownType) {
+          // Catch all clause matched or exactly the same type is caught
+          break;
+        }
+        if (___cxa_can_catch(caughtType, thrownType, catchInfo.get_adjusted_ptr_addr())) {
+          setTempRet0(caughtType); return ((catchInfo.ptr)|0);
+        }
+      }
+      setTempRet0(thrownType); return ((catchInfo.ptr)|0);
+    }
+
+  function ___cxa_find_matching_catch_4() {
       var thrown = exceptionLast;
       if (!thrown) {
         // just pass through the null ptr
@@ -5784,6 +5826,10 @@ var ASM_CONSTS = {
       return getTempRet0();
     }
 
+  function _llvm_eh_typeid_for(type) {
+      return type;
+    }
+
   function _setTempRet0(val) {
       setTempRet0(val);
     }
@@ -6362,6 +6408,7 @@ var asmLibraryArg = {
   "__cxa_end_catch": ___cxa_end_catch,
   "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2,
   "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3,
+  "__cxa_find_matching_catch_4": ___cxa_find_matching_catch_4,
   "__cxa_free_exception": ___cxa_free_exception,
   "__cxa_increment_exception_refcount": ___cxa_increment_exception_refcount,
   "__cxa_rethrow": ___cxa_rethrow,
@@ -6416,6 +6463,7 @@ var asmLibraryArg = {
   "invoke_viiiiiiiiii": invoke_viiiiiiiiii,
   "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii,
   "invoke_viij": invoke_viij,
+  "llvm_eh_typeid_for": _llvm_eh_typeid_for,
   "setTempRet0": _setTempRet0,
   "strftime_l": _strftime_l
 };
@@ -6529,10 +6577,10 @@ var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall
 var dynCall_viijii = Module["dynCall_viijii"] = createExportWrapper("dynCall_viijii");
 
 
-function invoke_ii(index,a1) {
+function invoke_iii(index,a1,a2) {
   var sp = stackSave();
   try {
-    return getWasmTableEntry(index)(a1);
+    return getWasmTableEntry(index)(a1,a2);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;
@@ -6562,10 +6610,21 @@ function invoke_vii(index,a1,a2) {
   }
 }
 
-function invoke_iii(index,a1,a2) {
+function invoke_v(index) {
   var sp = stackSave();
   try {
-    return getWasmTableEntry(index)(a1,a2);
+    getWasmTableEntry(index)();
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_ii(index,a1) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;
@@ -6588,17 +6647,6 @@ function invoke_vi(index,a1) {
   var sp = stackSave();
   try {
     getWasmTableEntry(index)(a1);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_v(index) {
-  var sp = stackSave();
-  try {
-    getWasmTableEntry(index)();
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;
