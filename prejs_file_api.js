@@ -18,8 +18,8 @@ self.addEventListener('message', function(e) {
                 files: files
                 }, '/work');
         };
-        console.log("baseZimFileName=" + baseZimFileName);
-        console.log('Module["arguments"]=' + Module["arguments"])
+        console.log("baseZimFileName = " + baseZimFileName);
+        console.log('Module["arguments"] = ' + Module["arguments"])
     }
     else if (action === "getArticleContentByUrl") {
         var content = Module.getArticleContentByUrl("/work/" + baseZimFileName, url);
