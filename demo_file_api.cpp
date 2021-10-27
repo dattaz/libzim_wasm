@@ -1,5 +1,5 @@
-#include <zim/file.h>
-#include <zim/fileiterator.h>
+#include <zim/archive.h>
+#include <zim/item.h>
 #include <iostream>
 #include <chrono>
 #include <emscripten/bind.h>
@@ -15,15 +15,16 @@ int main(int argc, char* argv[])
 
 // Get article count of a ZIM file (with kiwix-lib)
 unsigned int getArticleCount(std::string filename) {
-    zim::File f(filename);
-    return f.getCountArticles();
+    zim::Archive a(filename);
+    return a.getArticleCount();
 }
 
 // Get ArticleContent by URL (with libzim)
 std::string getArticleContentByUrl(std::string filename, std::string url) {
-    zim::File f(filename);    
-    zim::Article article = f.getArticleByUrl(url);
-    return article.getData(0).data();
+    zim::Archive a(filename);
+    zim::Entry entry = a.getEntryByPath(url);
+    zim::Item item = entry.getItem(true);
+    return item.getData();
 }
 
 // Binding code

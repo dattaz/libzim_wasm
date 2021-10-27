@@ -6483,13 +6483,13 @@ var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = createExportWrap
 var dynCall_viij = Module["dynCall_viij"] = createExportWrapper("dynCall_viij");
 
 /** @type {function(...*):?} */
-var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
-
-/** @type {function(...*):?} */
 var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
 
 /** @type {function(...*):?} */
 var dynCall_viijj = Module["dynCall_viijj"] = createExportWrapper("dynCall_viijj");
+
+/** @type {function(...*):?} */
+var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
 
 /** @type {function(...*):?} */
 var dynCall_iijj = Module["dynCall_iijj"] = createExportWrapper("dynCall_iijj");
@@ -6547,6 +6547,17 @@ function invoke_viii(index,a1,a2,a3) {
   }
 }
 
+function invoke_vii(index,a1,a2) {
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_iii(index,a1,a2) {
   var sp = stackSave();
   try {
@@ -6562,17 +6573,6 @@ function invoke_iiiiiii(index,a1,a2,a3,a4,a5,a6) {
   var sp = stackSave();
   try {
     return getWasmTableEntry(index)(a1,a2,a3,a4,a5,a6);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_vii(index,a1,a2) {
-  var sp = stackSave();
-  try {
-    getWasmTableEntry(index)(a1,a2);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;
