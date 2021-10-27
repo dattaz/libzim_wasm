@@ -24,9 +24,13 @@ self.addEventListener('message', function(e) {
     var action = e.data.action;
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
+    var baseZimFileName = files[0].name.replace(/\.zim..$/, '.zim');
     if (action === "init") {        
         console.log(files[0].name);
-        Module["arguments"] = ["/work/" + files[0].name];
+        Module["arguments"] = [];
+        for (let i = 0; i < files.length; i++) {
+            Module["arguments"].push("/work/" + files[i].name);
+        }
         Module["preInit"] = function() {
             FS.mkdir("/work");
             FS.mount(WORKERFS, {
@@ -36,11 +40,13 @@ self.addEventListener('message', function(e) {
         };
     }
     else if (action === "getArticleContentByUrl") {
-        var content = Module.getArticleContentByUrl("/work/" + files[0].name, url);
+        var content = Module.getArticleContentByUrl("/work/" + baseZimFileName, url);
         outgoingMessagePort.postMessage(content);
     }
     else if (action === "getArticleCount") {
-        var articleCount = Module.getArticleCount("/work/" + files[0].name);
+        console.log("baseZimFileName=" + baseZimFileName);
+        console.log('Module["arguments"]=' + Module["arguments"])
+        var articleCount = Module.getArticleCount("/work/" + baseZimFileName);
         outgoingMessagePort.postMessage(articleCount);
     }
 
