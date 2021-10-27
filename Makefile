@@ -22,10 +22,10 @@ build/lib/libzstd.a :
 	cd zstd-1.4.4/build/meson/builddir ; ninja install
 	
 build/lib/libicudata.so : 
-	wget -N https://github.com/unicode-org/icu/releases/download/release-63-2/icu4c-63_2-src.tgz
-	tar xf icu4c-63_2-src.tgz
-	# Quick and dirty way to make ICU handle Double-conversion, and to skip unnecessary compilation steps
-	cd icu ; patch -p1 <../patch_icu_for_emscripten.patch
+	wget -N https://github.com/unicode-org/icu/releases/download/release-69-1/icu4c-69_1-src.tgz
+	tar xf icu4c-69_1-src.tgz
+	# It's no use trying to compile examples
+	sed -i -e 's/^SUBDIRS =\(.*\)$$(DATASUBDIR) $$(EXTRA) $$(SAMPLE) $$(TEST)\(.*\)/SUBDIRS =\1\2/' icu/source/Makefile.in
 	cd icu/source ; emconfigure ./configure --prefix=`pwd`/../../build
 	cd icu/source ; emmake make 
 	cd icu/source ; emmake make install
