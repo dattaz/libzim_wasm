@@ -70,7 +70,7 @@
             var node = document.createElement("img");
             console.log("image content length " + content.length);
             var blob = new Blob([content], {
-                type: "image/webp"
+                type: "image"
             });
             var url = URL.createObjectURL(blob);
             node.addEventListener('load', function () {
@@ -82,7 +82,7 @@
       </script>
       <button type="button" onclick="callGetArticleCount()">Read article count</button>
       <br/>
-      URL : <input type="text" id="url" value="A/Baby_Grand">
+      URL : <input type="text" id="url" value="A/Baby_Grand"> (you can use I/Baby_Grand_Billy_Joel.jpg.webp to test an image)
       <br/>
       <button type="button" onclick="callGetContentByUrl()">Read content by its URL</button>
       <button type="button" onclick="callGetMimetypeByUrl()">Read MIME-type for an URL</button>
