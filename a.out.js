@@ -44,6 +44,7 @@ self.addEventListener("message", function(e) {
         Module["onRuntimeInitialized"] = function() {
             console.log("runtime initialized");
             Module.loadArchive("/work/" + baseZimFileName);
+            outgoingMessagePort.postMessage("runtime initialized");
         };
         Module["arguments"] = [];
         for (let i = 0; i < files.length; i++) {
