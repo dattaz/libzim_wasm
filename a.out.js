@@ -23,12 +23,14 @@ self.addEventListener("message", function(e) {
     var url = e.data.url;
     var outgoingMessagePort = e.ports[0];
     if (action === "getContentByUrl") {
-        var result = Module.getContentByUrl(url);
-        var content = result.content;
+        var entry = Module.getEntryByUrl(url);
+        // TODO handle redirections
+        var item = entry.getItem();
+        var content = item.getContent();
         console.log("vectorsize=" + content.size());
         // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
         var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: result.mimetype});
+        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype()});
     }
     else if (action === "getArticleCount") {
         var articleCount = Module.getArticleCount();
@@ -5946,92 +5948,6 @@ var ASM_CONSTS = {
       });
     }
 
-  function validateThis(this_, classType, humanName) {
-      if (!(this_ instanceof Object)) {
-          throwBindingError(humanName + ' with invalid "this": ' + this_);
-      }
-      if (!(this_ instanceof classType.registeredClass.constructor)) {
-          throwBindingError(humanName + ' incompatible with "this" of type ' + this_.constructor.name);
-      }
-      if (!this_.$$.ptr) {
-          throwBindingError('cannot call emscripten binding method ' + humanName + ' on deleted object');
-      }
-  
-      // todo: kill this
-      return upcastPointer(
-          this_.$$.ptr,
-          this_.$$.ptrType.registeredClass,
-          classType.registeredClass);
-    }
-  function __embind_register_class_property(
-      classType,
-      fieldName,
-      getterReturnType,
-      getterSignature,
-      getter,
-      getterContext,
-      setterArgumentType,
-      setterSignature,
-      setter,
-      setterContext
-    ) {
-      fieldName = readLatin1String(fieldName);
-      getter = embind__requireFunction(getterSignature, getter);
-  
-      whenDependentTypesAreResolved([], [classType], function(classType) {
-          classType = classType[0];
-          var humanName = classType.name + '.' + fieldName;
-          var desc = {
-              get: function() {
-                  throwUnboundTypeError('Cannot access ' + humanName + ' due to unbound types', [getterReturnType, setterArgumentType]);
-              },
-              enumerable: true,
-              configurable: true
-          };
-          if (setter) {
-              desc.set = function() {
-                  throwUnboundTypeError('Cannot access ' + humanName + ' due to unbound types', [getterReturnType, setterArgumentType]);
-              };
-          } else {
-              desc.set = function(v) {
-                  throwBindingError(humanName + ' is a read-only property');
-              };
-          }
-  
-          Object.defineProperty(classType.registeredClass.instancePrototype, fieldName, desc);
-  
-          whenDependentTypesAreResolved(
-              [],
-              (setter ? [getterReturnType, setterArgumentType] : [getterReturnType]),
-          function(types) {
-              var getterReturnType = types[0];
-              var desc = {
-                  get: function() {
-                      var ptr = validateThis(this, classType, humanName + ' getter');
-                      return getterReturnType['fromWireType'](getter(getterContext, ptr));
-                  },
-                  enumerable: true
-              };
-  
-              if (setter) {
-                  setter = embind__requireFunction(setterSignature, setter);
-                  var setterArgumentType = types[1];
-                  desc.set = function(v) {
-                      var ptr = validateThis(this, classType, humanName + ' setter');
-                      var destructors = [];
-                      setter(setterContext, ptr, setterArgumentType['toWireType'](destructors, v));
-                      runDestructors(destructors);
-                  };
-              }
-  
-              Object.defineProperty(classType.registeredClass.instancePrototype, fieldName, desc);
-              return [];
-          });
-  
-          return [];
-      });
-    }
-
   var emval_free_list = [];
   
   var emval_handle_array = [{},{value:undefined},{value:null},{value:true},{value:false}];
@@ -7251,7 +7167,6 @@ var asmLibraryArg = {
   "_embind_register_class": __embind_register_class,
   "_embind_register_class_constructor": __embind_register_class_constructor,
   "_embind_register_class_function": __embind_register_class_function,
-  "_embind_register_class_property": __embind_register_class_property,
   "_embind_register_emval": __embind_register_emval,
   "_embind_register_float": __embind_register_float,
   "_embind_register_function": __embind_register_function,
@@ -7288,7 +7203,6 @@ var asmLibraryArg = {
   "invoke_iiiiiiiiiiii": invoke_iiiiiiiiiiii,
   "invoke_iiiiiiiiiiiii": invoke_iiiiiiiiiiiii,
   "invoke_iiiiij": invoke_iiiiij,
-  "invoke_iij": invoke_iij,
   "invoke_jiiii": invoke_jiiii,
   "invoke_v": invoke_v,
   "invoke_vi": invoke_vi,
@@ -7298,7 +7212,6 @@ var asmLibraryArg = {
   "invoke_viiiiiii": invoke_viiiiiii,
   "invoke_viiiiiiiiii": invoke_viiiiiiiiii,
   "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii,
-  "invoke_viij": invoke_viij,
   "setTempRet0": _setTempRet0,
   "strftime_l": _strftime_l
 };
@@ -7367,19 +7280,19 @@ var ___cxa_can_catch = Module["___cxa_can_catch"] = createExportWrapper("__cxa_c
 var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = createExportWrapper("__cxa_is_pointer_type");
 
 /** @type {function(...*):?} */
-var dynCall_viij = Module["dynCall_viij"] = createExportWrapper("dynCall_viij");
-
-/** @type {function(...*):?} */
-var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
-
-/** @type {function(...*):?} */
 var dynCall_ji = Module["dynCall_ji"] = createExportWrapper("dynCall_ji");
 
 /** @type {function(...*):?} */
 var dynCall_viijj = Module["dynCall_viijj"] = createExportWrapper("dynCall_viijj");
 
 /** @type {function(...*):?} */
+var dynCall_iij = Module["dynCall_iij"] = createExportWrapper("dynCall_iij");
+
+/** @type {function(...*):?} */
 var dynCall_iijj = Module["dynCall_iijj"] = createExportWrapper("dynCall_iijj");
+
+/** @type {function(...*):?} */
+var dynCall_viij = Module["dynCall_viij"] = createExportWrapper("dynCall_viij");
 
 /** @type {function(...*):?} */
 var dynCall_ij = Module["dynCall_ij"] = createExportWrapper("dynCall_ij");
@@ -7423,17 +7336,6 @@ function invoke_iii(index,a1,a2) {
   }
 }
 
-function invoke_viii(index,a1,a2,a3) {
-  var sp = stackSave();
-  try {
-    getWasmTableEntry(index)(a1,a2,a3);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
 function invoke_iiii(index,a1,a2,a3) {
   var sp = stackSave();
   try {
@@ -7460,6 +7362,17 @@ function invoke_viiii(index,a1,a2,a3,a4) {
   var sp = stackSave();
   try {
     getWasmTableEntry(index)(a1,a2,a3,a4);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_viii(index,a1,a2,a3) {
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)(a1,a2,a3);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;
@@ -7636,28 +7549,6 @@ function invoke_iiiiii(index,a1,a2,a3,a4,a5) {
   var sp = stackSave();
   try {
     return getWasmTableEntry(index)(a1,a2,a3,a4,a5);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_viij(index,a1,a2,a3,a4) {
-  var sp = stackSave();
-  try {
-    dynCall_viij(index,a1,a2,a3,a4);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_iij(index,a1,a2,a3) {
-  var sp = stackSave();
-  try {
-    return dynCall_iij(index,a1,a2,a3);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;

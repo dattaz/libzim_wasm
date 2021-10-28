@@ -26,31 +26,51 @@ unsigned int getArticleCount() {
     return g_archive->getArticleCount();
 }
 
-class ContentWithMimetype{
+class ItemWrapper{
 public:
-    ContentWithMimetype(std::vector<char> _content, std::string _mimetype) {
-        content = _content;
-        mimetype = _mimetype;
-    }
+    ItemWrapper(zim::Item item):
+        m_item(item)
+    { }
 
-    std::vector<char> getContent() const { return content; }
-    std::string getMimetype() const { return mimetype; }
+    std::vector<char> getContent() const {
+      auto blob = m_item.getData();
+      std::vector<char> content = std::vector<char>(blob.data(), blob.data()+blob.size());
+      return content;
+    }
+    std::string getMimetype() const { return m_item.getMimetype(); }
 
 private:
-    std::vector<char> content;
-    std::string mimetype;
+    zim::Item m_item;
+};
+
+class EntryWrapper{
+public:
+    EntryWrapper(zim::Entry entry):
+        m_entry(entry)
+    { }
+
+    ItemWrapper getItem() {
+        return ItemWrapper(m_entry.getItem(true));
+    }
+    std::string getPath() {
+        return m_entry.getPath();
+    }
+    bool isRedirect() {
+        return m_entry.isRedirect();
+    }
+    EntryWrapper getRedirectEntry() {
+        return EntryWrapper(m_entry.getRedirectEntry());
+    }
+
+private:
+    zim::Entry m_entry;
 };
 
 // Get content (and MIME type) by URL
-ContentWithMimetype getContentByUrl(std::string url) {
+EntryWrapper getEntryByUrl(std::string url) {
     //try {
         zim::Entry entry = g_archive->getEntryByPath(url);
-        zim::Item item = entry.getItem(true);
-        auto blob = item.getData();
-        std::cout << "size of extracted content : " << blob.size() << std::endl;
-        std::vector<char> content = std::vector<char>(blob.data(), blob.data()+blob.size());
-        std::string mimetype = item.getMimetype();
-        return ContentWithMimetype(content, mimetype);
+        return EntryWrapper(entry);
     //} catch(zim::EntryNotFound& e) {
     //    return "Entry not found";
     //} catch(std::exception& e) {
@@ -61,12 +81,17 @@ ContentWithMimetype getContentByUrl(std::string url) {
 // Binding code
 EMSCRIPTEN_BINDINGS(libzim_module) {
     emscripten::function("loadArchive", &loadArchive);
-    emscripten::function("getContentByUrl", &getContentByUrl);
+    emscripten::function("getEntryByUrl", &getEntryByUrl);
     emscripten::function("getArticleCount", &getArticleCount);
     emscripten::register_vector<char>("vector<char>");
-    class_<ContentWithMimetype>("ContentWithMimetype")
-      .constructor<std::vector<char>, std::string>()
-      .property("content", &ContentWithMimetype::getContent)
-      .property("mimetype", &ContentWithMimetype::getMimetype)
+    class_<EntryWrapper>("EntryWrapper")
+      .function("getItem", &EntryWrapper::getItem)
+      .function("getPath", &EntryWrapper::getPath)
+      .function("isRedirect", &EntryWrapper::isRedirect)
+      .function("getRedirectEntry", &EntryWrapper::getRedirectEntry)
+      ;
+    class_<ItemWrapper>("ItemWrapper")
+      .function("getContent", &ItemWrapper::getContent)
+      .function("getMimetype", &ItemWrapper::getMimetype)
       ;
 }
