@@ -62,7 +62,8 @@
             worker.postMessage({action: "getContentByUrl", url: url}, [tmpMessageChannel.port2]);
         }
         function displayTextInIFrame() {
-            window.frames[0].document.body.innerHTML = content;
+            // TODO : TextDecoder is not supported by all platforms, see https://caniuse.com/?search=textdecoder
+            window.frames[0].document.body.innerHTML = new TextDecoder().decode(content);
         }
         function displayImageInIFrame() {
             window.frames[0].document.body.innerHTML = "";

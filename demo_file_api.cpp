@@ -27,16 +27,18 @@ unsigned int getArticleCount() {
 }
 
 // Get content by URL
-std::string getContentByUrl(std::string url) {
-    try {
+std::vector<char> getContentByUrl(std::string url) {
+    //try {
         zim::Entry entry = g_archive->getEntryByPath(url);
         zim::Item item = entry.getItem(true);
-        return item.getData();
-    } catch(zim::EntryNotFound& e) {
-        return "Entry not found";
-    } catch(std::exception& e) {
-        return std::string("Other exception : ") + e.what();
-    }
+        auto blob = item.getData();
+        std::cout << "size of extracted content : " << blob.size() << std::endl;
+        return std::vector<char>(blob.data(), blob.data()+blob.size());
+    //} catch(zim::EntryNotFound& e) {
+    //    return "Entry not found";
+    //} catch(std::exception& e) {
+    //    return std::string("Other exception : ") + e.what();
+    //}
 }
 
 // Get MIME type by URL
@@ -44,6 +46,7 @@ std::string getMimetypeByUrl(std::string url) {
     try {
         zim::Entry entry = g_archive->getEntryByPath(url);
         zim::Item item = entry.getItem(true);
+        std::cout << "size declared by ZIM file : " << item.getSize() << std::endl;
         return item.getMimetype();
     } catch(zim::EntryNotFound& e) {
         return "Entry not found";
@@ -53,9 +56,10 @@ std::string getMimetypeByUrl(std::string url) {
 }
 
 // Binding code
-EMSCRIPTEN_BINDINGS(kiwix_module) {
+EMSCRIPTEN_BINDINGS(libzim_module) {
     emscripten::function("loadArchive", &loadArchive);
     emscripten::function("getContentByUrl", &getContentByUrl);
     emscripten::function("getMimetypeByUrl", &getMimetypeByUrl);
     emscripten::function("getArticleCount", &getArticleCount);
+    emscripten::register_vector<char>("vector<char>");
 }

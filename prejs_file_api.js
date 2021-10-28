@@ -5,7 +5,10 @@ self.addEventListener("message", function(e) {
     var outgoingMessagePort = e.ports[0];
     if (action === "getContentByUrl") {
         var content = Module.getContentByUrl(url);
-        outgoingMessagePort.postMessage(content);
+        console.log("vectorsize=" + content.size());
+        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
+        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+        outgoingMessagePort.postMessage(contentArray);
     }
     else if (action === "getMimetypeByUrl") {
         var mimetype = Module.getMimetypeByUrl(url);
