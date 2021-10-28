@@ -26,10 +26,19 @@ self.addEventListener("message", function(e) {
         var entry = Module.getEntryByUrl(url);
         var item = entry.getItem(true);
         var content = item.getContent();
-        console.log("vectorsize=" + content.size());
+        console.log("contentsize=" + content.size());
         // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
         var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
         outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype()});
+    }
+    else if (action === "getEntryByUrl") {
+        var entry = Module.getEntryByUrl(url);
+        var item = entry.getItem(false);
+        var content = item.getContent();
+        console.log("contentsize=" + content.size());
+        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
+        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.iRedirect()});
     }
     else if (action === "getArticleCount") {
         var articleCount = Module.getArticleCount();
