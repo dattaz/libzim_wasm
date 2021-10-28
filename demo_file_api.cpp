@@ -49,8 +49,8 @@ public:
         m_entry(entry)
     { }
 
-    ItemWrapper getItem() {
-        return ItemWrapper(m_entry.getItem(true));
+    ItemWrapper getItem(bool follow) {
+        return ItemWrapper(m_entry.getItem(follow));
     }
     std::string getPath() {
         return m_entry.getPath();

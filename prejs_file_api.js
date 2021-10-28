@@ -5,8 +5,7 @@ self.addEventListener("message", function(e) {
     var outgoingMessagePort = e.ports[0];
     if (action === "getContentByUrl") {
         var entry = Module.getEntryByUrl(url);
-        // TODO handle redirections
-        var item = entry.getItem();
+        var item = entry.getItem(true);
         var content = item.getContent();
         console.log("vectorsize=" + content.size());
         // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
