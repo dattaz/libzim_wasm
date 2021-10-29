@@ -18,6 +18,7 @@ var Module = typeof Module !== 'undefined' ? Module : {};
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
 self.addEventListener("message", function(e) {
+    var t0 = performance.now();
     var action = e.data.action;
     var path = e.data.path;
     var outgoingMessagePort = e.ports[0];
@@ -31,15 +32,29 @@ self.addEventListener("message", function(e) {
                 item = entry.getItem(follow);
                 // It's necessary to keep an instance of the blob till the end of this block,
                 // to ensure that the corresponding content is not deleted on the C side.
+                var t1 = performance.now();
                 var blob = item.getData();
+                var t2 = performance.now();
                 var content = blob.getContent();
-                console.debug("content length = " + content.length);
+                var t3 = performance.now();
                 // TODO : is there a more efficient way to make the Array detachable? So that it can be transfered back from the WebWorker without a copy?
-                //var contentArray = new Uint8Array(content);
-                //var contentArray = new ArrayBuffer(content.length);
-                //new Uint8Array(contentArray).set(new Uint8Array(content));
-                var contentArray = content.slice(0);
+                var contentArray = new Uint8Array(content);
+                var t4 = performance.now();
                 outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+                var t5 = performance.now();
+                var getTime = Math.round(t1 - t0);
+                var getDataTime = Math.round(t2 - t1);
+                var getContentTime = Math.round(t3 - t2);
+                var copyArrayTime = Math.round(t4 - t3);
+                var postMessageTime = Math.round(t5 - t4);
+                var totalTime = Math.round(t5 - t0);
+                console.debug("content length = " + content.length + " read in " + totalTime + " ms"
+                        + " (" + getTime + " ms to find the entry, "
+                        + getDataTime + " ms for getData, "
+                        + getContentTime + " ms for getContent, "
+                        + copyArrayTime + " ms for array copying, "
+                        + postMessageTime + " ms for postMessage"
+                        + ")");
             }
             else {
                 outgoingMessagePort.postMessage({ content: new Uint8Array(), isRedirect: true, redirectPath: entry.getRedirectEntry().getPath()});
@@ -48,16 +63,6 @@ self.addEventListener("message", function(e) {
         else {
             outgoingMessagePort.postMessage({ content: new Uint8Array(), mimetype: "unknown", isRedirect: false});
         }
-    }
-    else if (action === "getEntryByTitleIndex") {
-        var titleIndex = e.data.titleIndex;
-        var entry = Module[action](titleIndex);
-        var item = entry.getItem(false);
-        var content = item.getContent();
-        console.debug("contentsize=" + content.size());
-        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
     }
     else if (action === "search") {
         var text = e.data.text;
