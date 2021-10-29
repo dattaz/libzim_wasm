@@ -6,6 +6,7 @@
 #include <chrono>
 #include <emscripten/bind.h>
 #include <emscripten/emscripten.h>
+#include <emscripten/val.h>
 
 using namespace emscripten;
 
@@ -27,16 +28,28 @@ unsigned int getArticleCount() {
     return g_archive->getArticleCount();
 }
 
+class BlobWrapper{
+public:
+    BlobWrapper(zim::Blob blob):
+        m_blob(blob)
+    { }
+
+    val getContent() const {
+      return val(typed_memory_view(m_blob.size(), m_blob.data()));
+    }
+
+private:
+    zim::Blob m_blob;
+};
+
 class ItemWrapper{
 public:
     ItemWrapper(zim::Item item):
         m_item(item)
     { }
 
-    std::vector<char> getContent() const {
-      auto blob = m_item.getData();
-      std::vector<char> content = std::vector<char>(blob.data(), blob.data()+blob.size());
-      return content;
+    BlobWrapper getData() const {
+      return BlobWrapper(m_item.getData());
     }
     std::string getMimetype() const { return m_item.getMimetype(); }
 
@@ -112,7 +125,10 @@ EMSCRIPTEN_BINDINGS(libzim_module) {
       .function("getRedirectEntry", &EntryWrapper::getRedirectEntry)
       ;
     class_<ItemWrapper>("ItemWrapper")
-      .function("getContent", &ItemWrapper::getContent)
+      .function("getData", &ItemWrapper::getData)
       .function("getMimetype", &ItemWrapper::getMimetype)
+      ;
+    class_<BlobWrapper>("BlobWrapper")
+      .function("getContent", &BlobWrapper::getContent)
       ;
 }

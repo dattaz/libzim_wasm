@@ -29,10 +29,16 @@ self.addEventListener("message", function(e) {
             var item = {};
             if (follow || !entry.isRedirect()) {
                 item = entry.getItem(follow);
-                var content = item.getContent();
-                console.debug("contentsize=" + content.size());
-                // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-                var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+                // It's necessary to keep an instance of the blob till the end of this block,
+                // to ensure that the corresponding content is not deleted on the C side.
+                var blob = item.getData();
+                var content = blob.getContent();
+                console.debug("content length = " + content.length);
+                // TODO : is there a more efficient way to make the Array detachable? So that it can be transfered back from the WebWorker without a copy?
+                //var contentArray = new Uint8Array(content);
+                //var contentArray = new ArrayBuffer(content.length);
+                //new Uint8Array(contentArray).set(new Uint8Array(content));
+                var contentArray = content.slice(0);
                 outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
             }
             else {
