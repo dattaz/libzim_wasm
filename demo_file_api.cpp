@@ -55,6 +55,9 @@ public:
     std::string getPath() {
         return m_entry.getPath();
     }
+    uint32_t getIndex() {
+        return m_entry.getIndex();
+    }
     bool isRedirect() {
         return m_entry.isRedirect();
     }
@@ -66,10 +69,22 @@ private:
     zim::Entry m_entry;
 };
 
-// Get content (and MIME type) by URL
-EntryWrapper getEntryByUrl(std::string url) {
+// Get an entry by its path
+EntryWrapper getEntryByPath(std::string url) {
     //try {
         zim::Entry entry = g_archive->getEntryByPath(url);
+        return EntryWrapper(entry);
+    //} catch(zim::EntryNotFound& e) {
+    //    return "Entry not found";
+    //} catch(std::exception& e) {
+    //    return std::string("Other exception : ") + e.what();
+    //}
+}
+
+// Get an entry by its title index
+EntryWrapper getEntryByTitleIndex(uint32_t idx) {
+    //try {
+        zim::Entry entry = g_archive->getEntryByTitle(idx);
         return EntryWrapper(entry);
     //} catch(zim::EntryNotFound& e) {
     //    return "Entry not found";
@@ -81,7 +96,8 @@ EntryWrapper getEntryByUrl(std::string url) {
 // Binding code
 EMSCRIPTEN_BINDINGS(libzim_module) {
     emscripten::function("loadArchive", &loadArchive);
-    emscripten::function("getEntryByUrl", &getEntryByUrl);
+    emscripten::function("getEntryByPath", &getEntryByPath);
+    emscripten::function("getEntryByTitleIndex", &getEntryByTitleIndex);
     emscripten::function("getArticleCount", &getArticleCount);
     emscripten::register_vector<char>("vector<char>");
     class_<EntryWrapper>("EntryWrapper")

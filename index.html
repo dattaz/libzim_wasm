@@ -6,7 +6,7 @@
         Web Worker + file api (only works if file < 2GB <a href="https://github.com/kripken/emscripten/issues/5250"> see emscripten issue </a>)<br/>
         See result in JS console and/or in the iframe below<br/>
         For now, split ZIM files are not supported.<br/>
-        If you want to do a quick test, you can choose the file <a href="https://download.kiwix.org/zim/wikipedia/wikipedia_en_ray_charles_maxi_2021-10.zim">wikipedia_en_ray_charles_maxi_2021-10.zim</a>, and use "A/Baby_Grand" as the URL.
+        If you want to do a quick test, you can choose the file <a href="https://download.kiwix.org/zim/wikipedia/wikipedia_en_ray_charles_maxi_2021-10.zim">wikipedia_en_ray_charles_maxi_2021-10.zim</a>, and use "A/Baby_Grand" as the Path.
         <br/>
         <br/>
         ZIM file(s) : <input type="file" id="your-files" multiple>
@@ -37,9 +37,9 @@
             worker.postMessage({action: "getArticleCount"}, [tmpMessageChannel.port2]);
         }
 
-        function callGetContentByUrl() {
+        function callGetContentByPath() {
             var tmpMessageChannel = new MessageChannel();
-            var url = document.getElementById("url").value;
+            var path = document.getElementById("path").value;
             var t0 = performance.now();
             tmpMessageChannel.port1.onmessage = function(event2){
                 var t1 = performance.now();
@@ -69,15 +69,15 @@
                     window.frames[0].document.body.innerHTML = new TextDecoder().decode(content);
                 }
             };
-            document.getElementById("status").textContent = "Reading content for url " + url;
-            worker.postMessage({action: "getContentByUrl", url: url}, [tmpMessageChannel.port2]);
+            document.getElementById("status").textContent = "Reading content for path " + path;
+            worker.postMessage({action: "getContentByPath", path: path}, [tmpMessageChannel.port2]);
         }
       </script>
       <button type="button" onclick="callGetArticleCount()">Read article count</button>
       <br/>
-      URL : <input type="text" id="url" value="A/Baby_Grand"> (you can use I/Baby_Grand_Billy_Joel.jpg.webp to test an image)
+      Path : <input type="text" id="path" value="A/Baby_Grand"> (you can use I/Baby_Grand_Billy_Joel.jpg.webp to test an image)
       <br/>
-      <button type="button" onclick="callGetContentByUrl()">Read content by its URL and display it</button>
+      <button type="button" onclick="callGetContentByPath()">Read content by its Path and display it</button>
       <br/>
       <div id="status"></div>
       <br/>

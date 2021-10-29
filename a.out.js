@@ -18,38 +18,49 @@ var Module = typeof Module !== 'undefined' ? Module : {};
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
 self.addEventListener("message", function(e) {
-    var files = e.data.files;
     var action = e.data.action;
-    var url = e.data.url;
+    var path = e.data.path;
     var outgoingMessagePort = e.ports[0];
-    if (action === "getContentByUrl") {
-        var entry = Module.getEntryByUrl(url);
+    console.debug("WebWorker called with action=" + action);
+    if (action === "getContentByPath") {
+        var entry = Module.getEntryByPath(path);
         var item = entry.getItem(true);
         var content = item.getContent();
-        console.log("contentsize=" + content.size());
+        console.debug("contentsize=" + content.size());
         // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
         var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
         outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype()});
     }
-    else if (action === "getEntryByUrl") {
-        var entry = Module.getEntryByUrl(url);
+    else if (action === "getEntryByPath") {
+        var entry = Module[action](path);
         var item = entry.getItem(false);
         var content = item.getContent();
-        console.log("contentsize=" + content.size());
+        console.debug("contentsize=" + content.size());
         // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
         var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.iRedirect()});
+        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+    }
+    else if (action === "getEntryByTitleIndex") {
+        var titleIndex = e.data.titleIndex;
+        var entry = Module[action](titleIndex);
+        var item = entry.getItem(false);
+        var content = item.getContent();
+        console.debug("contentsize=" + content.size());
+        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
+        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
     }
     else if (action === "getArticleCount") {
-        var articleCount = Module.getArticleCount();
+        var articleCount = Module[action]();
         outgoingMessagePort.postMessage(articleCount);
     }
     else if (action === "init") {
+        var files = e.data.files;
         // When using split ZIM files, we need to remove the last two letters of the suffix (like .zimaa -> .zim)
         var baseZimFileName = files[0].name.replace(/\.zim..$/, '.zim');
         Module = {};
         Module["onRuntimeInitialized"] = function() {
-            console.log("runtime initialized");
+            console.debug("runtime initialized");
             Module.loadArchive("/work/" + baseZimFileName);
             outgoingMessagePort.postMessage("runtime initialized");
         };
@@ -63,8 +74,8 @@ self.addEventListener("message", function(e) {
                 files: files
                 }, "/work");
         };
-        console.log("baseZimFileName = " + baseZimFileName);
-        console.log('Module["arguments"] = ' + Module["arguments"])
+        console.debug("baseZimFileName = " + baseZimFileName);
+        console.debug('Module["arguments"] = ' + Module["arguments"])
 
 
 
@@ -8118,6 +8129,10 @@ run();
 
 
 
+    }
+    else {
+        console.error("Invalid action : " + action);
+        outgoingMessagePort.postMessage("invalid action");
     }
 },false);
 
