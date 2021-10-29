@@ -69,9 +69,6 @@ public:
     std::string getPath() {
         return m_entry.getPath();
     }
-    uint32_t getIndex() {
-        return m_entry.getIndex();
-    }
     bool isRedirect() {
         return m_entry.isRedirect();
     }
