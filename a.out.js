@@ -22,23 +22,26 @@ self.addEventListener("message", function(e) {
     var path = e.data.path;
     var outgoingMessagePort = e.ports[0];
     console.debug("WebWorker called with action=" + action);
-    if (action === "getContentByPath") {
-        var entry = Module.getEntryByPath(path);
-        var item = entry.getItem(true);
-        var content = item.getContent();
-        console.debug("contentsize=" + content.size());
-        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype()});
-    }
-    else if (action === "getEntryByPath") {
+    if (action === "getEntryByPath") {
+        var follow = e.data.follow;
         var entry = Module[action](path);
-        var item = entry.getItem(false);
-        var content = item.getContent();
-        console.debug("contentsize=" + content.size());
-        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+        if (entry) {
+            var item = {};
+            if (follow || !entry.isRedirect()) {
+                item = entry.getItem(follow);
+                var content = item.getContent();
+                console.debug("contentsize=" + content.size());
+                // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
+                var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+                outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+            }
+            else {
+                outgoingMessagePort.postMessage({ content: new Uint8Array(), isRedirect: true, redirectPath: entry.getRedirectEntry().getPath()});
+            }
+        }
+        else {
+            outgoingMessagePort.postMessage({ content: new Uint8Array(), mimetype: "unknown", isRedirect: false});
+        }
     }
     else if (action === "getEntryByTitleIndex") {
         var titleIndex = e.data.titleIndex;
@@ -2162,6 +2165,41 @@ var ASM_CONSTS = {
     }
 
   function ___cxa_find_matching_catch_3() {
+      var thrown = exceptionLast;
+      if (!thrown) {
+        // just pass through the null ptr
+        setTempRet0(0); return ((0)|0);
+      }
+      var info = new ExceptionInfo(thrown);
+      var thrownType = info.get_type();
+      var catchInfo = new CatchInfo();
+      catchInfo.set_base_ptr(thrown);
+      catchInfo.set_adjusted_ptr(thrown);
+      if (!thrownType) {
+        // just pass through the thrown ptr
+        setTempRet0(0); return ((catchInfo.ptr)|0);
+      }
+      var typeArray = Array.prototype.slice.call(arguments);
+  
+      // can_catch receives a **, add indirection
+      // The different catch blocks are denoted by different types.
+      // Due to inheritance, those types may not precisely match the
+      // type of the thrown object. Find one which matches, and
+      // return the type of the catch block which should be called.
+      for (var i = 0; i < typeArray.length; i++) {
+        var caughtType = typeArray[i];
+        if (caughtType === 0 || caughtType === thrownType) {
+          // Catch all clause matched or exactly the same type is caught
+          break;
+        }
+        if (___cxa_can_catch(caughtType, thrownType, catchInfo.get_adjusted_ptr_addr())) {
+          setTempRet0(caughtType); return ((catchInfo.ptr)|0);
+        }
+      }
+      setTempRet0(thrownType); return ((catchInfo.ptr)|0);
+    }
+
+  function ___cxa_find_matching_catch_4() {
       var thrown = exceptionLast;
       if (!thrown) {
         // just pass through the null ptr
@@ -6776,6 +6814,10 @@ var ASM_CONSTS = {
       return getTempRet0();
     }
 
+  function _llvm_eh_typeid_for(type) {
+      return type;
+    }
+
   function _setTempRet0(val) {
       setTempRet0(val);
     }
@@ -7358,6 +7400,7 @@ var asmLibraryArg = {
   "__cxa_end_catch": ___cxa_end_catch,
   "__cxa_find_matching_catch_2": ___cxa_find_matching_catch_2,
   "__cxa_find_matching_catch_3": ___cxa_find_matching_catch_3,
+  "__cxa_find_matching_catch_4": ___cxa_find_matching_catch_4,
   "__cxa_free_exception": ___cxa_free_exception,
   "__cxa_increment_exception_refcount": ___cxa_increment_exception_refcount,
   "__cxa_rethrow": ___cxa_rethrow,
@@ -7424,6 +7467,7 @@ var asmLibraryArg = {
   "invoke_viiiiiii": invoke_viiiiiii,
   "invoke_viiiiiiiiii": invoke_viiiiiiiiii,
   "invoke_viiiiiiiiiiiiiii": invoke_viiiiiiiiiiiiiii,
+  "llvm_eh_typeid_for": _llvm_eh_typeid_for,
   "setTempRet0": _setTempRet0,
   "strftime_l": _strftime_l
 };
@@ -7574,6 +7618,39 @@ function invoke_viii(index,a1,a2,a3) {
   }
 }
 
+function invoke_ii(index,a1) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_v(index) {
+  var sp = stackSave();
+  try {
+    getWasmTableEntry(index)();
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_iiii(index,a1,a2,a3) {
+  var sp = stackSave();
+  try {
+    return getWasmTableEntry(index)(a1,a2,a3);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0 && e !== 'longjmp') throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_viiii(index,a1,a2,a3,a4) {
   var sp = stackSave();
   try {
@@ -7596,28 +7673,6 @@ function invoke_vii(index,a1,a2) {
   }
 }
 
-function invoke_ii(index,a1) {
-  var sp = stackSave();
-  try {
-    return getWasmTableEntry(index)(a1);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_iiii(index,a1,a2,a3) {
-  var sp = stackSave();
-  try {
-    return getWasmTableEntry(index)(a1,a2,a3);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
 function invoke_iiiiiii(index,a1,a2,a3,a4,a5,a6) {
   var sp = stackSave();
   try {
@@ -7633,17 +7688,6 @@ function invoke_vi(index,a1) {
   var sp = stackSave();
   try {
     getWasmTableEntry(index)(a1);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0 && e !== 'longjmp') throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_v(index) {
-  var sp = stackSave();
-  try {
-    getWasmTableEntry(index)();
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0 && e !== 'longjmp') throw e;

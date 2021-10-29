@@ -71,27 +71,17 @@ private:
 };
 
 // Get an entry by its path
-EntryWrapper getEntryByPath(std::string url) {
-    //try {
+std::unique_ptr<EntryWrapper> getEntryByPath(std::string url) {
+    try {
         zim::Entry entry = g_archive->getEntryByPath(url);
-        return EntryWrapper(entry);
-    //} catch(zim::EntryNotFound& e) {
-    //    return "Entry not found";
-    //} catch(std::exception& e) {
-    //    return std::string("Other exception : ") + e.what();
-    //}
-}
-
-// Get an entry by its title index
-EntryWrapper getEntryByTitleIndex(uint32_t idx) {
-    //try {
-        zim::Entry entry = g_archive->getEntryByTitle(idx);
-        return EntryWrapper(entry);
-    //} catch(zim::EntryNotFound& e) {
-    //    return "Entry not found";
-    //} catch(std::exception& e) {
-    //    return std::string("Other exception : ") + e.what();
-    //}
+        return std::unique_ptr<EntryWrapper>(new EntryWrapper(entry));
+    } catch(zim::EntryNotFound& e) {
+        std::cout << "entry " << url << " not found" << std::endl;
+        return nullptr;
+    } catch(std::exception& e) {
+        std::cout << "other exception : " << e.what() << std::endl;
+        return nullptr;
+    }
 }
 
 // Search for a text, and returns the path of the first result
@@ -111,7 +101,6 @@ std::vector<EntryWrapper> search(std::string text) {
 EMSCRIPTEN_BINDINGS(libzim_module) {
     emscripten::function("loadArchive", &loadArchive);
     emscripten::function("getEntryByPath", &getEntryByPath);
-    emscripten::function("getEntryByTitleIndex", &getEntryByTitleIndex);
     emscripten::function("getArticleCount", &getArticleCount);
     emscripten::function("search", &search);
     emscripten::register_vector<char>("vector<char>");

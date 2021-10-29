@@ -90,7 +90,7 @@
                 }
             };
             document.getElementById("status").textContent = "Reading content for path " + path;
-            worker.postMessage({action: "getContentByPath", path: path}, [tmpMessageChannel.port2]);
+            worker.postMessage({action: "getEntryByPath", path: path, follow: true}, [tmpMessageChannel.port2]);
         }
       </script>
       <button type="button" onclick="callGetArticleCount()">Read article count</button>

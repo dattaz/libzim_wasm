@@ -3,23 +3,26 @@ self.addEventListener("message", function(e) {
     var path = e.data.path;
     var outgoingMessagePort = e.ports[0];
     console.debug("WebWorker called with action=" + action);
-    if (action === "getContentByPath") {
-        var entry = Module.getEntryByPath(path);
-        var item = entry.getItem(true);
-        var content = item.getContent();
-        console.debug("contentsize=" + content.size());
-        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype()});
-    }
-    else if (action === "getEntryByPath") {
+    if (action === "getEntryByPath") {
+        var follow = e.data.follow;
         var entry = Module[action](path);
-        var item = entry.getItem(false);
-        var content = item.getContent();
-        console.debug("contentsize=" + content.size());
-        // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
-        var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
-        outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+        if (entry) {
+            var item = {};
+            if (follow || !entry.isRedirect()) {
+                item = entry.getItem(follow);
+                var content = item.getContent();
+                console.debug("contentsize=" + content.size());
+                // TODO : it would more efficient to read the data directly from the buffer, instead of copying it
+                var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
+                outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
+            }
+            else {
+                outgoingMessagePort.postMessage({ content: new Uint8Array(), isRedirect: true, redirectPath: entry.getRedirectEntry().getPath()});
+            }
+        }
+        else {
+            outgoingMessagePort.postMessage({ content: new Uint8Array(), mimetype: "unknown", isRedirect: false});
+        }
     }
     else if (action === "getEntryByTitleIndex") {
         var titleIndex = e.data.titleIndex;
