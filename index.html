@@ -36,6 +36,26 @@
             document.getElementById("status").textContent = "Reading articleCount...";
             worker.postMessage({action: "getArticleCount"}, [tmpMessageChannel.port2]);
         }
+        
+        function callSearch() {
+            var tmpMessageChannel = new MessageChannel();
+            var text = document.getElementById("search").value;
+            var t0 = performance.now();
+            tmpMessageChannel.port1.onmessage = function(event2){
+                var t1 = performance.now();
+                var readTime = Math.round(t1 - t0);
+                var entries = event2.data.entries;
+                document.getElementById("status").textContent = "Search has found " + entries.length + " results";
+                var html = "";
+                for (var i=0; i<entries.length; i++) {
+                    html += entries[i].path + "<br/>";
+                }
+                window.frames[0].document.body.innerHTML = html;
+                console.log("search done by the webworker in " + readTime + " milliseconds", event2);
+            };
+            document.getElementById("status").textContent = "Searching...";
+            worker.postMessage({action: "search", text: text}, [tmpMessageChannel.port2]);
+        }
 
         function callGetContentByPath() {
             var tmpMessageChannel = new MessageChannel();
@@ -78,6 +98,10 @@
       Path : <input type="text" id="path" value="A/Baby_Grand"> (you can use I/Baby_Grand_Billy_Joel.jpg.webp to test an image)
       <br/>
       <button type="button" onclick="callGetContentByPath()">Read content by its Path and display it</button>
+      <br/>
+      Search string : <input type="text" id="search" value="Ray">
+      <br/>
+      <button type="button" onclick="callSearch()">Search</button>
       <br/>
       <div id="status"></div>
       <br/>

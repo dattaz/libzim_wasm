@@ -31,6 +31,17 @@ self.addEventListener("message", function(e) {
         var contentArray = new Uint8Array(new Array(content.size()).fill(0).map((_, id) => content.get(id)));
         outgoingMessagePort.postMessage({ content: contentArray, mimetype: item.getMimetype(), isRedirect: entry.isRedirect()});
     }
+    else if (action === "search") {
+        var text = e.data.text;
+        var entries = Module[action](text);
+        console.debug("Found nb results = " + entries.size(), entries);
+        var serializedEntries = [];
+        for (var i=0; i<entries.size(); i++) {
+            var entry = entries.get(i);
+            serializedEntries.push({path: entry.getPath()});
+        }
+        outgoingMessagePort.postMessage({ entries: serializedEntries });
+    }
     else if (action === "getArticleCount") {
         var articleCount = Module[action]();
         outgoingMessagePort.postMessage(articleCount);

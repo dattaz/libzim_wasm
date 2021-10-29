@@ -1,6 +1,7 @@
 #include <zim/archive.h>
 #include <zim/item.h>
 #include <zim/error.h>
+#include <zim/search.h>
 #include <iostream>
 #include <chrono>
 #include <emscripten/bind.h>
@@ -93,13 +94,28 @@ EntryWrapper getEntryByTitleIndex(uint32_t idx) {
     //}
 }
 
+// Search for a text, and returns the path of the first result
+std::vector<EntryWrapper> search(std::string text) {
+    auto searcher = zim::Searcher(*g_archive);
+    auto query = zim::Query(text);
+    auto search = searcher.search(query);
+    auto searchResultSet = search.getResults(0,50);
+    std::vector<EntryWrapper> ret;
+    for(auto entry:searchResultSet) {
+        ret.push_back(EntryWrapper(entry));
+    }
+    return ret;
+}
+
 // Binding code
 EMSCRIPTEN_BINDINGS(libzim_module) {
     emscripten::function("loadArchive", &loadArchive);
     emscripten::function("getEntryByPath", &getEntryByPath);
     emscripten::function("getEntryByTitleIndex", &getEntryByTitleIndex);
     emscripten::function("getArticleCount", &getArticleCount);
+    emscripten::function("search", &search);
     emscripten::register_vector<char>("vector<char>");
+    emscripten::register_vector<EntryWrapper>("vector(EntryWrapper)");
     class_<EntryWrapper>("EntryWrapper")
       .function("getItem", &EntryWrapper::getItem)
       .function("getPath", &EntryWrapper::getPath)

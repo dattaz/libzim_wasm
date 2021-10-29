@@ -44,14 +44,14 @@ build/lib/libzim.a : build/lib/liblzma.so build/lib/libz.a build/lib/libzstd.a b
 	tar xf libzim-7.0.0.tar.gz
 	# It's no use trying to compile examples
 	sed -i -e "s/^subdir('examples')//" libzim-7.0.0/meson.build
-	cd libzim-7.0.0; PKG_CONFIG_PATH=/src/build/lib/pkgconfig meson --prefix=`pwd`/../build --cross-file=../emscripten-crosscompile.ini . build -DUSE_MMAP=false
+	cd libzim-7.0.0; PKG_CONFIG_PATH=/src/build/lib/pkgconfig meson --prefix=`pwd`/../build --cross-file=../emscripten-crosscompile.ini . build -DUSE_MMAP=false -Dstatic_linkage=true
 	# Quick and dirty way to make libzim compilable with emscripten
 	cd libzim-7.0.0 ; patch -p1 -F5 <../patch_libzim_for_emscripten.patch
 	cd libzim-7.0.0; ninja -C build
 	cd libzim-7.0.0; ninja -C build install
 
 demo_file_api.js: build/lib/libzim.a demo_file_api.cpp prejs_file_api.js postjs_file_api.js
-	em++ --bind demo_file_api.cpp build/lib/libzim.a -Ibuild/include -Lbuild/lib -lzstd -llzma -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080 -s ALLOW_MEMORY_GROWTH=1 -lworkerfs.js
+	em++ --bind demo_file_api.cpp -I/src/build/include -L/src/build/lib -lzim -llzma -lzstd -lxapian -lz -licui18n -licuuc -licudata -lpthread -lm -fdiagnostics-color=always -pipe -Wall -Winvalid-pch -Wnon-virtual-dtor -Werror -std=c++11 -O0 -g --pre-js prejs_file_api.js --post-js postjs_file_api.js -s DISABLE_EXCEPTION_CATCHING=0 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','print']" -s DEMANGLE_SUPPORT=1 -s TOTAL_MEMORY=83886080 -s ALLOW_MEMORY_GROWTH=1 -lworkerfs.js
 
 clean :
 	rm -rf xz-*
