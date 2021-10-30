@@ -1,27 +1,31 @@
 <!doctype html>
-      <html>
-      <head><meta charset="utf-8"><title>Big file Webassembly test-case</title></head>
-      <body>
-          <h1>Test-case for size limits with WebAssembly</h1>
-        Choose a big local file (can be generated with dd or with fallocate, for example : fallocate -l 5G example)
+<html>
+    <head><meta charset="utf-8"><title>Big file Webassembly test-case</title></head>
+    <body>
+        <h1>Test-case for file size limits with WebAssembly</h1>
+        Choose a big local file, and open your browser console to see the result.
         <br/>
         <br/>
         File to read : <input type="file" id="your-files">
-      <br/>
-      <script>
-        var worker = new Worker("bigfile.js");
-        var control = document.getElementById("your-files");
-        control.addEventListener("change", function(event) {
-            // When the control has changed, there is a new file
-            files = control.files;
-            console.log("new file selected");
-            var tmpMessageChannel = new MessageChannel();
-            tmpMessageChannel.port1.onmessage = function(event2){
-                console.log(event2.data);
-            };
-            worker.postMessage({files: files}, [tmpMessageChannel.port2]);
-        },false);
-      </script>
-      </body>
-      </html>
+        <br/>
+        <br/>
+        NB : If you don't have such big file, one can be easily generated with dd or with fallocate, for example :
+        <pre>fallocate -l 5G examplefile</pre>
+        <br/>
+        <script>
+            var worker = new Worker("bigfile.js");
+            var control = document.getElementById("your-files");
+            control.addEventListener("change", function (event) {
+                // When the control has changed, there is a new file
+                files = control.files;
+                console.log("new file selected");
+                var tmpMessageChannel = new MessageChannel();
+                tmpMessageChannel.port1.onmessage = function (event2) {
+                    console.log(event2.data);
+                };
+                worker.postMessage({files: files}, [tmpMessageChannel.port2]);
+            }, false);
+        </script>
+    </body>
+</html>
 
