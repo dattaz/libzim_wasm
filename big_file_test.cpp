@@ -3,6 +3,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <iostream>
+#include <emscripten/bind.h>
+#include <emscripten/emscripten.h>
 
 #define _1GB (1024*1024*1024LL)
 
@@ -10,53 +13,53 @@ int test_read_one_byte(int fd, uint64_t offset) {
   char out;
   ssize_t char_read;
 
-  printf("Try to read at position %li\n", offset);
+  printf("Try to read at position %lli\n", offset);
   char_read = pread(fd, &out, 1, offset);
   if (char_read == -1) {
     perror("Cannot read\n");
     return -1;
   }
   if (char_read == 1) {
-    printf("Byte at position %li is 0x%x.\n", offset, out);
+    printf("Byte at position %lli is 0x%x.\n", offset, out);
   } else {
-    printf("Cannot read but no error...\n");
+    printf("Nothing to read at this position (file too small?)...\n");
   }
 
   return char_read;
 }
 
-int test_big_file(char* filename) {
-  int fd = open(filename, O_RDONLY);
+int test_big_file(std::string filename) {
+  int fd = open(filename.c_str(), O_RDONLY);
   if (fd == -1) {
     perror("Cannot open filename");
     return -1;
   }
 
   if (test_read_one_byte(fd, 0) == -1) {
-    printf("Fail reading at positon 0\n");
+    printf("Fail reading at position 0\n");
     return -1;
   }
 
 
   // Read at 1Gb+1 offset
   if (test_read_one_byte(fd, _1GB+1) == -1) {
-    printf("Fail reading at positon 1GB+1\n");
+    printf("Fail reading at position 1GB+1\n");
     return -1;
   }
 
   // Read at 2Gb+1 offset
   if (test_read_one_byte(fd, 2*_1GB+1) == -1) {
-    printf("Fail reading at positon 2GB+1\n");
+    printf("Fail reading at position 2GB+1\n");
     return -1;
   }
   // Read at 3Gb+1 offset
   if (test_read_one_byte(fd, 3*_1GB+1) == -1) {
-    printf("Fail reading at positon 3GB+1\n");
+    printf("Fail reading at position 3GB+1\n");
     return -1;
   }
   // Read at 4Gb+1 offset
   if (test_read_one_byte(fd, 4*_1GB+1) == -1) {
-    printf("Fail reading at positon 4GB+1\n");
+    printf("Fail reading at position 4GB+1\n");
     return -1;
   }
 
@@ -65,11 +68,11 @@ int test_big_file(char* filename) {
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
-    printf("Usage :\n%s <file_bigger_than_4g>\n", argv[0]);
-    return -1;
-  }
-
-  return test_big_file(argv[1]);
+  std::cout << "wasm initialized" << std::endl;
+  return 0;
 }
 
+// Binding code
+EMSCRIPTEN_BINDINGS(testcase_module) {
+    emscripten::function("test_big_file", &test_big_file);
+}
