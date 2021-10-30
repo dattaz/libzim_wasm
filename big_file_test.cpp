@@ -68,7 +68,6 @@ int test_big_file(std::string filename) {
 }
 
 int main(int argc, char* argv[]) {
-  std::cout << "wasm initialized" << std::endl;
   return 0;
 }
 
