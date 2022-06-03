@@ -62,6 +62,37 @@ int test_big_file(std::string filename) {
     printf("Fail reading at position 4GB+1\n");
     return -1;
   }
+  // Read at 5Gb+1 offset
+  if (test_read_one_byte(fd, 5*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+  // Read at 6Gb+1 offset
+  if (test_read_one_byte(fd, 6*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+  // Read at 7Gb+1 offset
+  if (test_read_one_byte(fd, 7*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+  // Read at 8Gb+1 offset
+  if (test_read_one_byte(fd, 8*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+  // Read at 9Gb+1 offset
+  if (test_read_one_byte(fd, 9*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+  // Read at 10Gb+1 offset
+  if (test_read_one_byte(fd, 10*_1GB+1) == -1) {
+    printf("Fail reading at position 4GB+1\n");
+    return -1;
+  }
+
 
   // Everything ok
   return 0;

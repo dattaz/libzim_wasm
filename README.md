@@ -18,9 +18,9 @@ sudo apt install zlib1g-dev libicu-dev libxapian-dev liblzma-dev
 While being at the root of this repository :
  - Build the Docker image with the provided Dockerfile (based on https://hub.docker.com/r/emscripten/emsdk , which is based on Debian) :
 ```
-docker build -t "docker-emscripten-libzim:v2" ./docker
+docker build -t "docker-emscripten-libzim:v3" ./docker
 ```
  - Run the build with :
 ```
-docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v2 make
+docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v3 make
 ```
