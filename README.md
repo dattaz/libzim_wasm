@@ -1,6 +1,6 @@
 # Prototype of libzim in Webassembly
 
-Demo at https://mossroy.github.io/libzim_wasm/
+Demo at https://openzim.github.io/javascript-libzim/
 
 It uses WORKERFS as FS with emscripten and run in a web worker, file object is mount before run, and name is passed as argument.
 
