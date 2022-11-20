@@ -8,11 +8,11 @@ build/lib/liblzma.so :
 	cd xz-5.2.4 ; emmake make install
 	
 build/lib/libz.a : 
-	wget -N https://zlib.net/zlib-1.2.12.tar.gz
-	tar xf zlib-1.2.12.tar.gz
-	cd zlib-1.2.12 ; emconfigure ./configure --prefix=`pwd`/../build
-	cd zlib-1.2.12 ; emmake make
-	cd zlib-1.2.12 ; emmake make install
+	wget -N https://zlib.net/zlib-1.2.13.tar.gz
+	tar xf zlib-1.2.13.tar.gz
+	cd zlib-1.2.13 ; emconfigure ./configure --prefix=`pwd`/../build
+	cd zlib-1.2.13 ; emmake make
+	cd zlib-1.2.13 ; emmake make install
 	
 build/lib/libzstd.a : 
 	wget -N https://github.com/facebook/zstd/releases/download/v1.4.4/zstd-1.4.4.tar.gz
