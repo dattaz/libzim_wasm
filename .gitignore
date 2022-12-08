@@ -1,5 +1,6 @@
+.vscode/
 /nbproject/private/
-/build/
+/build*
 /xz-*/
 /zlib-*/
 /zstd-*/
@@ -11,6 +12,6 @@
 /zstd-*.tar.gz
 /icu4c-*.tgz
 /xapian-core-*.tar.xz
-/libzim-*.tar.gz
+/libzim-*
 ssh_key
 github_token
