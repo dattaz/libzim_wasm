@@ -1,10 +1,24 @@
 # Prototype of libzim in WebAssembly (WASM)
 
-This Repository provides the source code and utilities for compiling the [ZIM File](https://wiki.openzim.org/wiki/ZIM_file_format) reader [lbizim](https://wiki.openzim.org/wiki/Libzim) from C++ to [WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly) (and [ASM.js](https://developer.mozilla.org/en-US/docs/Games/Tools/asm.js)).
+This Repository provides the source code and utilities for compiling
+the [ZIM File](https://wiki.openzim.org/wiki/ZIM_file_format) reader
+[lbizim](https://wiki.openzim.org/wiki/Libzim) from C++ to
+[WebAssembly](https://developer.mozilla.org/en-US/docs/WebAssembly)
+(and
+[ASM.js](https://developer.mozilla.org/en-US/docs/Games/Tools/asm.js)).
 
-A prototype in HTML/JS, for testing the WASM version, is provided at https://openzim.github.io/javascript-libzim/tests/prototyep/. This prototype uses WORKERFS as the Emscripten File System and runs in a Web Worker. The file object is mounted before run, and the name is passed as argument.
+A prototype in HTML/JS, for testing the WASM version, is provided at
+https://openzim.github.io/javascript-libzim/tests/prototyep/. This
+prototype uses WORKERFS as the Emscripten File System and runs in a
+Web Worker. The file object is mounted before run, and the name is
+passed as argument.
 
-There is also an HTML/JS utility for testing the ability of Emscripten File Systems to read large files (muliti-gigabyte) at https://openzim.github.io/javascript-libzim/tests/test_large_file_access/.
+There is also an HTML/JS utility for testing the ability of Emscripten
+File Systems to read large files (muliti-gigabyte) at
+https://openzim.github.io/javascript-libzim/tests/test_large_file_access/.
+
+[![CodeFactor](https://www.codefactor.io/repository/github/openzim/javascript-libzim/badge)](https://www.codefactor.io/repository/github/openzim/javascript-libzim)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Steps to recompile manually
 
