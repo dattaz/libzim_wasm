@@ -105,7 +105,9 @@ clean :
 	rm -rf zlib-*
 	rm -rf xapian-core-*
 	rm -rf icu*
+	rm -rf large_file_*
 	rm -rf libzim-*
+	rm -rf libzim_wasm-*
 	rm -rf build
 
 .PHONY : all clean
