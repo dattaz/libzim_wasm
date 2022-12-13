@@ -14,5 +14,6 @@
 /xapian-core-*.tar.xz
 /libzim-*
 /libzim_wasm-*.tar.gz
+/large_file_*
 ssh_key
 github_token
