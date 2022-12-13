@@ -20,35 +20,41 @@ https://openzim.github.io/javascript-libzim/tests/test_large_file_access/.
 [![CodeFactor](https://www.codefactor.io/repository/github/openzim/javascript-libzim/badge)](https://www.codefactor.io/repository/github/openzim/javascript-libzim)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+## Nightly and Release versions
+
+WASM and ASM versions are built nightly from the binaries provided (nightly) by [kiwix-build](https://github.com/kiwix/kiwix-build). The artefacts are made available at https://download.openzim.org/nightly/.
+
+Released versions are published both in [Releases] and at https://download.openzim.org/release/javascript-libzim/. 
+
 ## Steps to recompile manually
 
-- Install emscripten : https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html
-- Install dependencies necessary for compilation. On ubuntu 18.04, you need to activate universe repository and:
+* Install Emscripten : https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html
+* Install dependencies necessary for compilation. On ubuntu 18.04, you need to activate universe repository and:
 
 ```
 sudo apt install ninja-build meson pkg-config python3 autopoint libtool autoconf
 sudo apt install zlib1g-dev libicu-dev libxapian-dev liblzma-dev
 ```
 
-- activate emscripten environment variables with something like `source ./emsdk_env.sh`
-- run `make`
+* Activate emscripten environment variables with something like `source ./emsdk_env.sh`
+* Run `make`.
 
-## Steps to recompile with Docker
+## Steps to recompile from source with Docker
 
-While being at the root of this repository:
- - Build the Docker image with the provided Dockerfile (based on https://hub.docker.com/r/emscripten/emsdk, which is based on Debian):
+* Open a terminal at the root of this repository:
+* Build the Docker image with the provided Dockerfile (based on https://hub.docker.com/r/emscripten/emsdk, which is based on Debian):
 
 ```
 docker build -t "docker-emscripten-libzim:v3" ./docker
 ```
 
- - Run the build with:
+* Run the build with:
 
 ```
 docker run --rm -v $(pwd):/src -v /tmp/emscripten_cache/:/home/emscripten/.emscripten_cache -u $(id -u):$(id -g) -it docker-emscripten-libzim:v3 make
 ```
 
-## License
+## Licence
 
 [GPLv3](https://www.gnu.org/licenses/gpl-3.0) or later, see
-[LICENSE](LICENSE) for more details.
+[LICENCE](LICENSE) for more details.
