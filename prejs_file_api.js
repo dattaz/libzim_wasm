@@ -55,14 +55,20 @@ self.addEventListener("message", function(e) {
         };
         Module["arguments"] = [];
         for (let i = 0; i < files.length; i++) {
-            Module["arguments"].push("/work/" + files[i].name);
+              Module["arguments"].push('/work/' + files[i].name);
         }
         Module["preRun"] = function() {
             FS.mkdir("/work");
-            FS.mount(WORKERFS, {
-                files: files
+            if (files[0].readMode === 'electron') {
+                var path = files[0].path.replace(/[^\\/]+$/, '');
+                FS.mount(NODEFS, {
+                    root: path
+                }, "/work");    
+            } else {
+                FS.mount(WORKERFS, {
+                    files: files
                 }, "/work");
+            }
         };
         console.debug("baseZimFileName = " + baseZimFileName);
         console.debug('Module["arguments"] = ' + Module["arguments"])
-
