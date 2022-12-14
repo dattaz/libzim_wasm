@@ -22,9 +22,17 @@ https://openzim.github.io/javascript-libzim/tests/test_large_file_access/.
 
 ## Nightly and Release versions
 
-WASM and ASM versions are built nightly from the binaries provided (nightly) by [kiwix-build](https://github.com/kiwix/kiwix-build). The artefacts are made available at https://download.openzim.org/nightly/.
+WASM and ASM versions are built nightly from the binaries provided (nightly) by [kiwix-build](https://github.com/kiwix/kiwix-build). The artefacts are made
+available at https://download.openzim.org/nightly/.
 
-Released versions are published both in [Releases] and at https://download.openzim.org/release/javascript-libzim/. 
+Released versions are published both in [Releases](https://github.com/openzim/javascript-libzim/releases) and at https://download.openzim.org/release/javascript-libzim/.
+
+These versions are built with both the WORKERFS and the NODEFS [Emscripten File Systems](https://emscripten.org/docs/api_reference/Filesystem-API.html).
+Please note that WORKERFS must be run in a Web Worker, and so the JavaScript glue (interface to the C++ code) is provided as a Worker. Messages are sent
+to and received from the Worker via [`window.postMessage()`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage).
+
+You can change the File Systems and other parameters in the provided [Makefile](https://github.com/openzim/javascript-libzim/blob/main/Makefile) in this Repository.
+This recipe needs to be run in an Emscripten-configured system or a customized Emscripten container (see below).
 
 ## Steps to recompile manually
 
