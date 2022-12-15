@@ -17,7 +17,7 @@ There is also an HTML/JS utility for testing the ability of Emscripten
 File Systems to read large files (muliti-gigabyte) at
 https://openzim.github.io/javascript-libzim/tests/test_large_file_access/.
 
-[![CodeFactor](https://www.codefactor.io/repository/github/openzim/javascript-libzim/badge)](https://www.codefactor.io/repository/github/openzim/javascript-libzim)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/openzim/javascript-libzim/Build%20and%20publish%20release%20artefacts%20(Docker)/main) [![CodeFactor](https://www.codefactor.io/repository/github/openzim/javascript-libzim/badge)](https://www.codefactor.io/repository/github/openzim/javascript-libzim)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Nightly and Release versions
