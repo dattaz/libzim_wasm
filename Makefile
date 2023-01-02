@@ -88,7 +88,7 @@ libzim-asm.dev.js: libzim_bindings.cpp prejs_file_api.js postjs_file_api.js
 
 # Production WASM version with WORKERFS and NODEFS, optimized and packed
 libzim-wasm.js: libzim_bindings.cpp prejs_file_api.js postjs_file_api.js
-	em++ -o libzim-wasm.js --bind libzim_bindings.cpp -I/src/build/include -L/src/build/lib -lzim -llzma -lzstd -lxapian -lz -licui18n -lptrhead -licuuc -licudata -O3 --pre-js prejs_file_api.js --post-js postjs_file_api.js -s WASM=1 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','print']" -s INITIAL_MEMORY=83886080 -s ALLOW_MEMORY_GROWTH=1 -lworkerfs.js -lnodefs.js
+	em++ -o libzim-wasm.js --bind libzim_bindings.cpp -I/src/build/include -L/src/build/lib -lzim -llzma -lzstd -lxapian -lz -licui18n -lpthread -licuuc -licudata -O3 --pre-js prejs_file_api.js --post-js postjs_file_api.js -s WASM=1 -s "EXPORTED_RUNTIME_METHODS=['ALLOC_NORMAL','printErr','ALLOC_STACK','print']" -s INITIAL_MEMORY=83886080 -s ALLOW_MEMORY_GROWTH=1 -lworkerfs.js -lnodefs.js
 
 # Production ASM version with WORKERFS and NODEFS, optimized and packed
 libzim-asm.js: libzim_bindings.cpp prejs_file_api.js postjs_file_api.js
