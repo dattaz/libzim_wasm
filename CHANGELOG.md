@@ -1,6 +1,36 @@
 # Changelog of Libzim JavaScript port
 
-The WASM and ASM ports of libzim for JavaScript applications is built on the official [libzim releases](https://download.openzim.org/release/libzim/). Early ports were created by building the libzim WASM binary (`libzim.a`) from scratch, but from version 0.1, we have been using the binary produced by [Kiwix build](https://github.com/kiwix/kiwix-build) as the basis for building the JavaScript application with Emscripten. We release both WASM and ASM applications. Release packages can be obtained from [Releases](https://github.com/openzim/javascript-libzim/releases) or from https://download.openzim.org/release/javascript-libzim/.
+The WASM and ASM ports of libzim for JavaScript applications is built on the official
+[libzim releases](https://download.openzim.org/release/libzim/). Early ports, and v0.4 (see reasons below), were created by building the libzim
+WASM binary (`libzim.a`) from scratch, but from version 0.1, we have been using the binary produced by
+[Kiwix build](https://github.com/kiwix/kiwix-build) as the basis for building the JavaScript application with Emscripten. We release both WASM and
+ASM applications. Release packages can be obtained from [Releases](https://github.com/openzim/javascript-libzim/releases) or from
+https://download.openzim.org/release/javascript-libzim/.
+
+## Javascript Libzim v0.4 (2023-10-13)
+
+This release uses Emscripten 3.1.41 to build the final ASM/WASM versions from libzim **source** v8.2.1. It is built from source code because
+building from the intermediate `libzim.a` binary leads to the broken version released in 0.3. Full-text searching is confirmed to be working in
+this release.
+
+Changelog includes changes since v0.2, since the 0.3 release was broken:
+
+* Try to compile with 3.1.41 (current latest) by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/52
+* Pull different EMSDK versions according to build type by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/53
+* Update libzim version for source build to 8.2.0 by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/54
+* Update libzim 8.2.1 for release 0.3 by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/56
+* Update prototype with v0.3 by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/57 (reverted)
+
+## Javascript Libzim v0.3 (2023-10-12)
+
+This BROKEN release was based on Emscripten 3.1.41 and updated the libzim dependency to v8.2.1. It was built from the provided `libzim.a` binary.
+However, it was discovered subsequent to release that the WASM and ASM versions were partially broken: they can read a ZIM's contents, but cannot
+complete a full-text search (Xapian).
+
+* Try to compile with 3.1.41 (current latest) by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/52
+* Pull different EMSDK versions according to build type by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/53
+* Update libzim version for source build to 8.2.0 by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/54
+* Update libzim 8.2.1 for release 0.3 by @Jaifroid in https://github.com/openzim/javascript-libzim/pull/56
 
 ## JavaScript Libzim v0.2 (2023-04-17)
 
