@@ -2,10 +2,9 @@
  * @fileoverview Unit tests for the prototype.
  */
 
-import { By, Key, until, WebDriver } from 'selenium-webdriver';
+import { By, until, WebDriver } from 'selenium-webdriver';
 import assert from 'assert';
 import path from 'path';
-
 
 const filename = 'wikipedia_en_ray_charles_maxi_2023-09.zim';
 const filepath = path.resolve('./tests/prototype/' + filename);
@@ -65,7 +64,6 @@ function runTests (driver) {
             await driver.switchTo().frame('iframeResult');
             // Get the contents of the title element by tag name
             var title = await driver.executeScript('return document.getElementsByTagName("title")[0].innerHTML');
-            console.log(title);
             assert.ok(title.includes('Baby Grand'));
             // Switch back to main document
             await driver.switchTo().defaultContent();

@@ -7,6 +7,8 @@ release: libzim-asm.js libzim-wasm.js libzim-asm.dev.js libzim-wasm.dev.js large
 nightly: libzim-asm.js libzim-wasm.js libzim-asm.dev.js libzim-wasm.dev.js large_file_access.js
 
 rename_pjsn:
+	# Due to a bug in Emscripten, we need to rename package.json before building libzim from source,
+	# otherwise it prevents compilation of (at least) xz utilities
 	mv package.json package.json.temp
 
 restore_pjsn:
